@@ -1,0 +1,5 @@
+pydantic
+invoke
+requests
+jinja2
+schedule

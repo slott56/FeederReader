@@ -1,0 +1,19 @@
+[cleaner]
+    days_ago = 90
+
+[reader]
+    base_directory = "data"
+    feeds = [
+        "https://ecf.dcd.uscourts.gov/cgi-bin/rss_outside.pl",
+        "https://ecf.nyed.uscourts.gov/cgi-bin/readyDockets.pl",
+        ## "https://ecf.cacd.uscourts.gov/cgi-bin/rss_outside.pl",
+        ## "https://ecf.nysd.uscourts.gov/cgi-bin/rss_outside.pl",
+    ]
+
+[filter]
+    dockets = ["16-cv-07161", "16-cv-01557", "18-cv-00979", "17-cv-06331-ARR-CLP"]
+
+[writer]
+    format = "html"  # Or md or csv
+    page_size = 20
+    base_directory = "output"

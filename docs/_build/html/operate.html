@@ -1,0 +1,161 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>Operate &#8212; RSS FDRDR 2024.1 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/alabaster.css" />
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="Test and Development" href="test.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="operate">
+<h1>Operate<a class="headerlink" href="#operate" title="Permalink to this headline">¶</a></h1>
+<p>There are four separate parts:</p>
+<ul class="simple">
+<li><p>Cleaning,</p></li>
+<li><p>Reading,</p></li>
+<li><p>Filtering, and</p></li>
+<li><p>Writing.</p></li>
+</ul>
+<p>The cleaner removes cache files older the 90 days.</p>
+<p>The reader scans the RSS feeds and updates the cache files with new items.</p>
+<p>The filter scans the cache files for specific dockets, and updates a cache of items with those docket numbers.</p>
+<p>The writer creates a static HTML web site with indices organized by court, docket, and date.</p>
+<p>A <code class="docutils literal notranslate"><span class="pre">config.toml</span></code> file has the configuation</p>
+<div class="highlight-toml notranslate"><div class="highlight"><pre><span></span><span class="k">[cleaner]</span>
+<span class="w">    </span><span class="n">days_ago</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">90</span>
+
+<span class="k">[reader]</span>
+<span class="w">    </span><span class="n">base_directory</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;data&quot;</span>
+<span class="w">    </span><span class="n">feeds</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span>
+<span class="w">        </span><span class="s2">&quot;https://ecf.dcd.uscourts.gov/cgi-bin/rss_outside.pl&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="s2">&quot;https://ecf.nyed.uscourts.gov/cgi-bin/readyDockets.pl&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="c1">## &quot;https://ecf.cacd.uscourts.gov/cgi-bin/rss_outside.pl&quot;,</span>
+<span class="w">        </span><span class="c1">## &quot;https://ecf.nysd.uscourts.gov/cgi-bin/rss_outside.pl&quot;,</span>
+<span class="w">    </span><span class="p">]</span>
+
+<span class="k">[filter]</span>
+<span class="w">    </span><span class="n">dockets</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;16-cv-07161&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;16-cv-01557&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;18-cv-00979&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;17-cv-06331-ARR-CLP&quot;</span><span class="p">]</span>
+
+<span class="k">[writer]</span>
+<span class="w">    </span><span class="n">format</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;html&quot;</span><span class="w">  </span><span class="c1"># Or md or csv</span>
+<span class="w">    </span><span class="n">page_size</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">20</span>
+<span class="w">    </span><span class="n">base_directory</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;output&quot;</span>
+</pre></div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">data</span></code> and <code class="docutils literal notranslate"><span class="pre">output</span></code> directories named in the config
+<em>must</em> exist before running any of the programs.
+The app does <em>not</em> create these two top-level directories.</p>
+<p>Cleaning and Reading is all in one place:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>src/reader.py
+</pre></div>
+</div>
+<p>Filtering:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>src/filter.py
+</pre></div>
+</div>
+<p>Writing:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>src/filter.py
+</pre></div>
+</div>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">RSS FDRDR</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="context.html">Context</a></li>
+<li class="toctree-l1"><a class="reference internal" href="containers.html">Containers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="components.html">Components</a></li>
+<li class="toctree-l1"><a class="reference internal" href="code.html">Code</a></li>
+<li class="toctree-l1"><a class="reference internal" href="install.html">Install</a></li>
+<li class="toctree-l1"><a class="reference internal" href="test.html">Test and Development</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Operate</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="test.html" title="previous chapter">Test and Development</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2023, S.Lott.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 4.4.0</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.13</a>
+      
+      |
+      <a href="_sources/operate.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

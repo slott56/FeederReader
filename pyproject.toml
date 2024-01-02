@@ -1,0 +1,17 @@
+[project]
+name = "FeederReader"
+version = "2024.1.0"
+description = "Read and extract content RSS feeds."
+readme = "README.md"
+requires-python = ">=3.11"
+license = {file = "LICENSE"}
+authors = [
+  {email = "slott56@gmail.com"},
+  {name = "Steven F. Lott"}
+]
+
+[build-system]
+build-backend = 'setuptools.build_meta'
+requires = [
+    'setuptools',
+]
