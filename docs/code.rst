@@ -9,6 +9,26 @@ Model
    :members:
    :undoc-members:
 
+Common
+-------
+
+..  automodule:: common
+   :members:
+   :undoc-members:
+
+Storage
+--------
+
+..  automodule:: storage
+    :members:
+    :undoc-members:
+
+Notification
+------------
+
+..  automodule:: notification
+    :members:
+    :undoc-members:
 
 Reader
 ------
@@ -35,12 +55,5 @@ Monitor
 -------
 
 ..  automodule:: monitor
-   :members:
-   :undoc-members:
-
-Common
--------
-
-..  automodule:: common
    :members:
    :undoc-members:

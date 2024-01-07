@@ -1,0 +1,9 @@
+## Put this in your home directory.
+## Set the mode to ``400`` to limit this to owner read only.
+
+[notifier.smtp]
+    host = "smtp.your host"
+    port = 587
+    admin = "admin@domain.smtp.your host"
+    password = "admin password"
+    send_to = "slott56@gmail.com"

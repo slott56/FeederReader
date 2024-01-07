@@ -28,3 +28,6 @@ Development needs this.
 :: bash
 
     python -m pip install -r requirements-dev.txt
+
+There are two locations for configuration files that are often edited as part of installation.
+These are addressed in the Operations section.

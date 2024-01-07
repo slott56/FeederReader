@@ -4,6 +4,7 @@ Test the monitor module.
 Requires --log-format="%(levelname)s:%(name)s:%(message)s"
 
 """
+import datetime
 import logging
 from unittest.mock import Mock, call
 
@@ -36,8 +37,12 @@ def test_schedule_runner(monkeypatch, caplog):
     monitor.main()
     assert mock_app.mock_calls == [call()]
     assert mock_sleep.mock_calls == [call(60)]
+    now = datetime.datetime.now()
+    if now.hour >= 10:
+        now = now + datetime.timedelta(days=1)
+    run_day = now.strftime("%Y-%m-%d")
     assert caplog.text.splitlines() == [
-        f'INFO:monitor:Schedule: [Every 1 day at 10:00:00 do functools.partial({mock_app!r})() (last run: [never], next run: 2024-01-03 10:00:00)]',
+        f'INFO:monitor:Schedule: [Every 1 day at 10:00:00 do functools.partial({mock_app!r})() (last run: [never], next run: {run_day} 10:00:00)]',
         'INFO:monitor:Schedule stopped.',
     ]
 

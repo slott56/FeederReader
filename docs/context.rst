@@ -7,15 +7,19 @@ There are several asynchronous parts to the processing.
 ..  plantuml::
 
     @startuml
+    left to right direction
+
     actor Journalist
     actor AOUSC
     actor FeederReader as fr
+
     cloud Pacer {
         (RSS upload) as upload
         (RSS reader-filter-writer) as rfw
         (Notification) as note
         (HTML Pages) as web
     }
+
     AOUSC --> upload
     fr --> rfw
     fr --> note

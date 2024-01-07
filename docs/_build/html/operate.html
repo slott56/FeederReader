@@ -43,9 +43,17 @@
 </ul>
 <p>The cleaner removes cache files older the 90 days.</p>
 <p>The reader scans the RSS feeds and updates the cache files with new items.</p>
-<p>The filter scans the cache files for specific dockets, and updates a cache of items with those docket numbers.</p>
+<p>The filter scans the cache files for specific dockets, and updates a cache of items with those docket numbers.
+The filter may invoke notification to send an email.</p>
 <p>The writer creates a static HTML web site with indices organized by court, docket, and date.</p>
-<p>A <code class="docutils literal notranslate"><span class="pre">config.toml</span></code> file has the configuation</p>
+<section id="configuration">
+<h2>Configuration<a class="headerlink" href="#configuration" title="Permalink to this headline">¶</a></h2>
+<p>There are two configuration files:</p>
+<ul class="simple">
+<li><p>The current working directory has a <code class="docutils literal notranslate"><span class="pre">config.toml</span></code> with most of the configuration details.</p></li>
+<li><p>The user’s home directory has a <code class="docutils literal notranslate"><span class="pre">~/fdrdr_config.toml</span></code> with sensitive credential information.</p></li>
+</ul>
+<p>A <code class="docutils literal notranslate"><span class="pre">config.toml</span></code> file can look like this:</p>
 <div class="highlight-toml notranslate"><div class="highlight"><pre><span></span><span class="k">[cleaner]</span>
 <span class="w">    </span><span class="n">days_ago</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">90</span>
 
@@ -59,29 +67,69 @@
 <span class="w">    </span><span class="p">]</span>
 
 <span class="k">[filter]</span>
-<span class="w">    </span><span class="n">dockets</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;16-cv-07161&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;16-cv-01557&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;18-cv-00979&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;17-cv-06331-ARR-CLP&quot;</span><span class="p">]</span>
+<span class="w">    </span><span class="n">dockets</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;2:23-cv-04570-HG&quot;</span><span class="p">]</span>
 
 <span class="k">[writer]</span>
 <span class="w">    </span><span class="n">format</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;html&quot;</span><span class="w">  </span><span class="c1"># Or md or csv</span>
 <span class="w">    </span><span class="n">page_size</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">20</span>
 <span class="w">    </span><span class="n">base_directory</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;output&quot;</span>
+
+<span class="k">[notifier.smtp]</span>
+<span class="w">    </span><span class="c1"># details here.</span>
+
+<span class="k">[monitor]</span>
+<span class="w">    </span><span class="n">every</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;07:00&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;20:00&quot;</span><span class="p">]</span>
 </pre></div>
 </div>
 <p>The <code class="docutils literal notranslate"><span class="pre">data</span></code> and <code class="docutils literal notranslate"><span class="pre">output</span></code> directories named in the config
 <em>must</em> exist before running any of the programs.
 The app does <em>not</em> create these two top-level directories.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">~/fdrdr_config.toml</span></code> file can look like this:</p>
+<div class="highlight-toml notranslate"><div class="highlight"><pre><span></span><span class="k">[notifier.smtp]</span>
+<span class="w">    </span><span class="n">host</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;smtp.your host&quot;</span>
+<span class="w">    </span><span class="n">port</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">587</span>
+<span class="w">    </span><span class="n">admin</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;admin@domain.smtp.your host&quot;</span>
+<span class="w">    </span><span class="n">password</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;admin password&quot;</span>
+<span class="w">    </span><span class="n">send_to</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;slott56@gmail.com&quot;</span>
+</pre></div>
+</div>
+<p>This file has credentials and is – therefore – kept away from everything else.</p>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<p>Don’t put <code class="docutils literal notranslate"><span class="pre">~/fdrdr_config.toml</span></code> file into Git.</p>
+</div>
+<p>It helps to change the mode to make the file only accessible by the owner.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>chmod<span class="w"> </span><span class="m">400</span><span class="w"> </span>~/fdrdr_config.toml
+</pre></div>
+</div>
+<p>This reduces the possibility of compromise.</p>
+</section>
+<section id="general-monitoring">
+<h2>General Monitoring<a class="headerlink" href="#general-monitoring" title="Permalink to this headline">¶</a></h2>
+<p>First, create the required two configuration files.</p>
+<p>Open a terminal window to use the command line interface (CLI).</p>
+<p>Run the whole show with scheduled times of day to perform the processing steps:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>%<span class="w"> </span>python<span class="w"> </span>src/monitor.py
+</pre></div>
+</div>
+<p>Once this starts, the terminal window can be safely ignored. Don’t close it. Just leave it be.</p>
+<p>To stop it, use <strong>Control-C</strong> in the terminal window.</p>
+</section>
+<section id="individual-steps">
+<h2>Individual Steps<a class="headerlink" href="#individual-steps" title="Permalink to this headline">¶</a></h2>
 <p>Cleaning and Reading is all in one place:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>src/reader.py
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>%<span class="w"> </span>python<span class="w"> </span>src/reader.py
 </pre></div>
 </div>
 <p>Filtering:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>src/filter.py
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>%<span class="w"> </span>python<span class="w"> </span>src/filter.py
 </pre></div>
 </div>
 <p>Writing:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>src/filter.py
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>%<span class="w"> </span>python<span class="w"> </span>src/writer.py
 </pre></div>
 </div>
+</section>
 </section>
 
 
@@ -109,7 +157,12 @@ The app does <em>not</em> create these two top-level directories.</p>
 <li class="toctree-l1"><a class="reference internal" href="code.html">Code</a></li>
 <li class="toctree-l1"><a class="reference internal" href="install.html">Install</a></li>
 <li class="toctree-l1"><a class="reference internal" href="test.html">Test and Development</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Operate</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Operate</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#configuration">Configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#general-monitoring">General Monitoring</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#individual-steps">Individual Steps</a></li>
+</ul>
+</li>
 </ul>
 
 <div class="relations">

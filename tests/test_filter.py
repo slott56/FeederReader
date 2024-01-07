@@ -85,8 +85,8 @@ def test_filter(caplog, monkeypatch, mock_config, mock_storage, mock_history):
         "INFO:filter:History start     1",
         "INFO:filter:Scanning downloaded items",
         "INFO:filter:Saving filter.json",
+        "INFO:LogNote:Writing 1 items to ('notification', '2024-Jan-07.md')",
         "INFO:filter:History end       2",
-        "INFO:filter:New Items         1",
         "INFO:filter:Counter({'history:end': 2, 'targets': 1, 'history:start': 1})",
     ]
     assert mock_storage.write_json.mock_calls == [

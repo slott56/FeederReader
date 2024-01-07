@@ -37,9 +37,77 @@
 <h1>Components<a class="headerlink" href="#components" title="Permalink to this headline">¶</a></h1>
 <p>We have the following software architecture.</p>
 <figure class="align-default">
-<img alt="https://www.plantuml.com/plantuml/svg/RP5H3W8X34J_UufUO3s2sQkGfMk8G0dM66EykrKJAWWVXBpfp41OB-AgN5C4A6uxknFXJkIfLdAwumDGryQfSAOicDXJF9JxWB_J_tmFKMRyLiEK9yv1U2BeIRKtVmBO52xByQTy4Anz4AmUclaZjESrQu-RiST3YbssZp7UvnY7bRBNttW1" src="https://www.plantuml.com/plantuml/svg/RP5H3W8X34J_UufUO3s2sQkGfMk8G0dM66EykrKJAWWVXBpfp41OB-AgN5C4A6uxknFXJkIfLdAwumDGryQfSAOicDXJF9JxWB_J_tmFKMRyLiEK9yv1U2BeIRKtVmBO52xByQTy4Anz4AmUclaZjESrQu-RiST3YbssZp7UvnY7bRBNttW1" />
+<img alt="https://www.plantuml.com/plantuml/svg/RP9R2iCW44N_PnLk85r2oLP4noBrXPbIIkdUEqt1jn_1dAjdVEq7oKmFxm2IL7TvGs4GDUQCah_Y3OARYZx5W864ZnhT9Rq6p3qVmymFYfcTSn0YMMEL9BkQzYy-SsCThVWpsoNdDLbUmI_u0DG_iMtNfiWGr2f3KCj06NC6uswWkC-u75e_g-3YxV5WgMVSQohlFPKFekPIUbCJzAecW1s3vlVo1G==" src="https://www.plantuml.com/plantuml/svg/RP9R2iCW44N_PnLk85r2oLP4noBrXPbIIkdUEqt1jn_1dAjdVEq7oKmFxm2IL7TvGs4GDUQCah_Y3OARYZx5W864ZnhT9Rq6p3qVmymFYfcTSn0YMMEL9BkQzYy-SsCThVWpsoNdDLbUmI_u0DG_iMtNfiWGr2f3KCj06NC6uswWkC-u75e_g-3YxV5WgMVSQohlFPKFekPIUbCJzAecW1s3vlVo1G==" />
 </figure>
-<p>The package has a few modules.</p>
+<p>Some of these modules are stand-alone applications.</p>
+<ul class="simple">
+<li><p>Monitor</p></li>
+<li><p>Reader</p></li>
+<li><p>Filter</p></li>
+<li><p>Writer</p></li>
+</ul>
+<p>We’ll look at each in a little more detail.</p>
+<section id="monitor">
+<h2>Monitor<a class="headerlink" href="#monitor" title="Permalink to this headline">¶</a></h2>
+<p>The monitor executes the feeder reader using its own internal scheduler.</p>
+<figure class="align-default">
+<img alt="https://www.plantuml.com/plantuml/svg/LOzB2iCm34JtEeMMxHMSJLOzG2zGN7lS21mxA4wpABbx7KFw6H28Ds8OzNEnMfOn4hMDo2YiPvTJa0VT5ucUPpV0Bn4TaMA2BMpg7DHpaN7tk6gg6L8a9xu07dgxrZGelvgxoxW8cw3TbsYx-G51Ola3gye7R4UBTP08FeMiU4BFH3sIhw-y0G==" src="https://www.plantuml.com/plantuml/svg/LOzB2iCm34JtEeMMxHMSJLOzG2zGN7lS21mxA4wpABbx7KFw6H28Ds8OzNEnMfOn4hMDo2YiPvTJa0VT5ucUPpV0Bn4TaMA2BMpg7DHpaN7tk6gg6L8a9xu07dgxrZGelvgxoxW8cw3TbsYx-G51Ola3gye7R4UBTP08FeMiU4BFH3sIhw-y0G==" />
+</figure>
+<p>To change the schedule, use <strong>control-c</strong> to crash the application.
+It consumes very few resources, and can be left running in a terminal window.
+It can be started or stopped as needed.</p>
+</section>
+<section id="reader">
+<h2>Reader<a class="headerlink" href="#reader" title="Permalink to this headline">¶</a></h2>
+<p>The reader consumes data from USCourts RSS feeds and captures it locally.</p>
+<figure class="align-default">
+<img alt="https://www.plantuml.com/plantuml/svg/JOyz3u9038Rt_ehcTXmS7Gn61XPY8d5mh5nDCCSTtiTW3F_T4X3eqBJFcxvjyn39nzGPWCPrlRDi8tecpLw8SKdZwNAhp_W5b7YsXl5QrslZzqW1bJ050u2cI0yAZ6Fn7t96xF0kKLL5CTEDKfORjZYtaRkmUmLd5ss0ASkYwQeiouxpkNX0zKxiFmfcC6ghoQWtrCVaMG7aRBLy_GC=" src="https://www.plantuml.com/plantuml/svg/JOyz3u9038Rt_ehcTXmS7Gn61XPY8d5mh5nDCCSTtiTW3F_T4X3eqBJFcxvjyn39nzGPWCPrlRDi8tecpLw8SKdZwNAhp_W5b7YsXl5QrslZzqW1bJ050u2cI0yAZ6Fn7t96xF0kKLL5CTEDKfORjZYtaRkmUmLd5ss0ASkYwQeiouxpkNX0zKxiFmfcC6ghoQWtrCVaMG7aRBLy_GC=" />
+</figure>
+<p>Here’s a more detailed view of the processing.</p>
+<figure class="align-default">
+<img alt="https://www.plantuml.com/plantuml/svg/PP31JWGX38RlVOeUTrzXvh96BoPwCYPUMQOuDGnbeSGOi-zkXsmcet8WmFV_vMzFLLtHjaI0VWB8jhEo9FIHNAA2tp0KSXDwIO7VHu2X4vGuOU18TOJhthUAk-slhr0cfpW4AKZEpnY89dj7MuEfQbi8TIPyUtx2Agrukj5_JbPQRgoxpuqjpUlBlRdqqU03gUE8SluWhpib1poqn9T6n_MhjDqsHQztbpEb2LLmvgfIldgduoOooE5Nji_P17XOf51FLuzRmtkqjcpekivRCi39AjduVm0=" src="https://www.plantuml.com/plantuml/svg/PP31JWGX38RlVOeUTrzXvh96BoPwCYPUMQOuDGnbeSGOi-zkXsmcet8WmFV_vMzFLLtHjaI0VWB8jhEo9FIHNAA2tp0KSXDwIO7VHu2X4vGuOU18TOJhthUAk-slhr0cfpW4AKZEpnY89dj7MuEfQbi8TIPyUtx2Agrukj5_JbPQRgoxpuqjpUlBlRdqqU03gUE8SluWhpib1poqn9T6n_MhjDqsHQztbpEb2LLmvgfIldgduoOooE5Nji_P17XOf51FLuzRmtkqjcpekivRCi39AjduVm0=" />
+</figure>
+<p>The resulting files have the following structure:</p>
+<figure class="align-default">
+<img alt="https://www.plantuml.com/plantuml/svg/SoWkIImgAStDuU9Aoyz9IIrII4aiILIevb800gX8913u-hguG4MHP3myaCJ0ufavgGgP9QcvnNfPnVbvSBbQT9qP6KOAYSKAIXuUIbYDWCWYJ5B2PvGnNgEC2HXLouNisKeWoCrDIO4u0EPr9MnAZD6KSC7j118bgKMG800Qxv2Qbm8COW0=" src="https://www.plantuml.com/plantuml/svg/SoWkIImgAStDuU9Aoyz9IIrII4aiILIevb800gX8913u-hguG4MHP3myaCJ0ufavgGgP9QcvnNfPnVbvSBbQT9qP6KOAYSKAIXuUIbYDWCWYJ5B2PvGnNgEC2HXLouNisKeWoCrDIO4u0EPr9MnAZD6KSC7j118bgKMG800Qxv2Qbm8COW0=" />
+</figure>
+<p>The files are decomposed by day to make it easy to clean up old files.
+Within a day, they’re decomposed by hour to make the files small and fast to process.</p>
+<p>Within a JSON file (either an <code class="docutils literal notranslate"><span class="pre">items.json</span></code> or <code class="docutils literal notranslate"><span class="pre">filter.json</span></code>) the structure is
+as follows</p>
+<figure class="align-default">
+<img alt="https://www.plantuml.com/plantuml/svg/XL512i8m4Bpd5Jdg8Hy88e9U14-AvnBJLHUJj2HR4DI_cwOfRL5e3Y4xsPt9J3Q1bAV66iQqKI7mysbRDPxs17O7fD3m5-DnOGJa-3QX-gwS0oFvjZkmJy_JjkHHGZ8WUI2VIeFk4PcEXrIL4BJ7ch1oGqlTN8fIKHngTq8BBE6l-5f2_U5NNzc2r6tnj6OvY8wUbxNBIZ-0HipHBKBeW1dEHBDw2p6ndQMouJcBCn8_QKlP1is5M4z5_pJcx5Dl7p_RW2lZRtu1" src="https://www.plantuml.com/plantuml/svg/XL512i8m4Bpd5Jdg8Hy88e9U14-AvnBJLHUJj2HR4DI_cwOfRL5e3Y4xsPt9J3Q1bAV66iQqKI7mysbRDPxs17O7fD3m5-DnOGJa-3QX-gwS0oFvjZkmJy_JjkHHGZ8WUI2VIeFk4PcEXrIL4BJ7ch1oGqlTN8fIKHngTq8BBE6l-5f2_U5NNzc2r6tnj6OvY8wUbxNBIZ-0HipHBKBeW1dEHBDw2p6ndQMouJcBCn8_QKlP1is5M4z5_pJcx5Dl7p_RW2lZRtu1" />
+</figure>
+</section>
+<section id="filter">
+<h2>Filter<a class="headerlink" href="#filter" title="Permalink to this headline">¶</a></h2>
+<p>The filter examines the captured JSON files, examining all of the  <code class="docutils literal notranslate"><span class="pre">USCourtItemDetail</span></code>
+instances. The that match the docket information are written to a
+separate file, <code class="docutils literal notranslate"><span class="pre">filter.json</span></code>.</p>
+<figure class="align-default">
+<img alt="https://www.plantuml.com/plantuml/svg/JOyz3i8m38LtdyBA7Ww04EhGeKiFm6Y8AmNb1oL635NlJjf06m-M_RxtPBdBGadUtW4yed_5m45miauu0HWIkbDcN0US0KjDqHbEU2irZdt_Knio38sswTOnMc6VJyySmyuMEFhcgMUhQG6eArwqRj9uHfMOZFfZhQzjSEMVLFmAeEDWocTV" src="https://www.plantuml.com/plantuml/svg/JOyz3i8m38LtdyBA7Ww04EhGeKiFm6Y8AmNb1oL635NlJjf06m-M_RxtPBdBGadUtW4yed_5m45miauu0HWIkbDcN0US0KjDqHbEU2irZdt_Knio38sswTOnMc6VJyySmyuMEFhcgMUhQG6eArwqRj9uHfMOZFfZhQzjSEMVLFmAeEDWocTV" />
+</figure>
+<p>Any changes to the filter file are important.
+A notification strategy is provided in the <code class="xref py py-mod docutils literal notranslate"><span class="pre">notification</span></code> module.</p>
+</section>
+<section id="writer">
+<h2>Writer<a class="headerlink" href="#writer" title="Permalink to this headline">¶</a></h2>
+<p>The writer builds a web site from the captured files.</p>
+<figure class="align-default">
+<img alt="https://www.plantuml.com/plantuml/svg/ZL4n3eCm3Dpz2YixFA13nS30mWCwfiIej92WnAYLAlxU12AWHQh8O2LtFfzopXnBoqFN0bIcwuqcpVYq3PC5K9BbLJh2SC4te3-rQHLPlFXJbdaUqGrJ51jimfkMq0_iN7ftHY_S26kTUdpnjdFJ213dcO7xWR_TApDOtbe7UTMWT2WQhUYLthXhnTPW5YfJFMYdL4UKaccdumF2-LU_qlglSafieK8OQtwO9CavhWXFA2n99I2-0nK3yzG42e2CjF8h_W0=" src="https://www.plantuml.com/plantuml/svg/ZL4n3eCm3Dpz2YixFA13nS30mWCwfiIej92WnAYLAlxU12AWHQh8O2LtFfzopXnBoqFN0bIcwuqcpVYq3PC5K9BbLJh2SC4te3-rQHLPlFXJbdaUqGrJ51jimfkMq0_iN7ftHY_S26kTUdpnjdFJ213dcO7xWR_TApDOtbe7UTMWT2WQhUYLthXhnTPW5YfJFMYdL4UKaccdumF2-LU_qlglSafieK8OQtwO9CavhWXFA2n99I2-0nK3yzG42e2CjF8h_W0=" />
+</figure>
+</section>
+<section id="notification">
+<h2>Notification<a class="headerlink" href="#notification" title="Permalink to this headline">¶</a></h2>
+<p>Choices involve</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>SMTP from a local computer</p></li>
+<li><p>SNS when deployed in an AWS lambda</p></li>
+<li><p>A fancy Text User Interface (TUI) application to show status and notifications</p></li>
+</ul>
+</div></blockquote>
+</section>
 </section>
 
 
@@ -63,7 +131,14 @@
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="context.html">Context</a></li>
 <li class="toctree-l1"><a class="reference internal" href="containers.html">Containers</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Components</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Components</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#monitor">Monitor</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#reader">Reader</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#filter">Filter</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#writer">Writer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#notification">Notification</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="code.html">Code</a></li>
 <li class="toctree-l1"><a class="reference internal" href="install.html">Install</a></li>
 <li class="toctree-l1"><a class="reference internal" href="test.html">Test and Development</a></li>

@@ -20,6 +20,9 @@ conda activate feederreader
 python -m pip install -r requirements.txt
 ```
 
+If you want the SMTP notifier, you need to configure it.
+
+
 # Test
 
 Testing uses ``tox``
@@ -67,25 +70,43 @@ A `config.toml` file has the congiguation
     format = "html"  # Or md or csv
     page_size = 20
     base_directory = "output"
+
+[monitor]
+    every = ["10:00", "22:00"]
+
 ```
 
 The `data` and `output` directories *must* exist before running any of the programs.
 The app does *not* create these two top-level directories.
 
-Cleaning and Reading is all in one place:
+Put the credentials in your personal home directory.
+Use the name ``~/fdrdr_config.toml``
 
-```bash
-python src/reader.py
+```toml
+[notifier.smtp]
+    host = "smtp.your host"
+    port = 587
+    admin = "your@domain.your host"
+    password = "password"
+    send_to = "your@mail.com"
 ```
 
-Filtering:
+Be sure to protect this file so it's only readable by you.
 
 ```bash
-python src/filter.py
+chmod 600 ~/fdrdr_config.toml
 ```
 
-Writing:
+You can set ``FDRDR_CREDENTIALS``
+to use another directory instead of your personal
+home directory.
+
+This command runs the internal schedule:
 
 ```bash
-python src/filter.py
+python src/monitor.py
 ```
+
+The terminal window can then be ignored.
+
+Use **Control-C** to stop it.

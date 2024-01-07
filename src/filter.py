@@ -19,6 +19,7 @@ from typing import cast
 import common
 from model import USCourtItemDetail
 from storage import Storage, LocalFileStorage
+from notification import LogNote
 
 
 def match_items(
@@ -58,6 +59,7 @@ def filter() -> None:
     config = common.get_config()
     rdr_config = config["reader"]
     ftr_config = config["filter"]
+    nfr_config = config["notifier"]
 
     rdr_base = Path.cwd() / rdr_config["base_directory"]
     storage = LocalFileStorage(rdr_base)
@@ -78,21 +80,19 @@ def filter() -> None:
     logger.info("History start %5d", len(history))
     counts["history:start"] = start
 
-    logger.info("Scanning downloaded items")
-    for path in storage.listdir(("*", "*", "items.json")):
-        for new_item in match_items(storage, path, targets, history, counts):
-            history.add(new_item)
+    with LogNote(storage, nfr_config) as notifier:
 
-    logger.info("Saving filter.json")
-    history_items = sorted(history, key=lambda d: d.item.pub_date)
-    storage.write_json("filter.json", history_items)
+        logger.info("Scanning downloaded items")
+        for path in storage.listdir(("*", "*", "items.json")):
+            for new_item in match_items(storage, path, targets, history, counts):
+                history.add(new_item)
+                notifier.notify(str(new_item))
+
+        logger.info("Saving filter.json")
+        history_items = sorted(history, key=lambda d: d.item.pub_date)
+        storage.write_json("filter.json", history_items)
 
     logger.info("History end   %5d", len(history_items))
-    if len(history) != start:
-        logger.info("New Items     %5d", len(history) - start)
-
-        ## TODO: NOTIFICATION -- SMTP or SNS or LOG
-
     counts["history:end"] = len(history)
 
     logger.info(counts)

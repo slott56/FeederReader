@@ -11,9 +11,15 @@
     ]
 
 [filter]
-    dockets = ["16-cv-07161", "16-cv-01557", "18-cv-00979", "17-cv-06331-ARR-CLP"]
+    dockets = ["2:23-cv-04570-HG"]
 
 [writer]
     format = "html"  # Or md or csv
     page_size = 20
     base_directory = "output"
+
+[notifier.smtp]
+    # details here.
+
+[monitor]
+    every = ["07:00", "20:00"]
