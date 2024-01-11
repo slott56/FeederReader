@@ -2,27 +2,45 @@
 Operate
 #######
 
-
 There are four separate parts:
 
--   Cleaning,
--   Reading,
--   Filtering, and
--   Writing.
+-   **Cleaner**. Removes cache files older the 90 days.
+-   **Reader**. Parses the RSS feeds and updates the cache files with new items.
+-   **Filter**. Reads the cache files looking for specific dockets, and updates a cache of items with those docket numbers. The filter will also invoke notification to send an email.
+-   **Writer**. Creates a static HTML web site with indices organized by court, docket, and date
 
-The cleaner removes cache files older the 90 days.
+Currently, this is bundled with all four steps being done together.
 
-The reader scans the RSS feeds and updates the cache files with new items.
+It makes sense to decompose this into two kinds of operations:
 
-The filter scans the cache files for specific dockets, and updates a cache of items with those docket numbers.
-The filter may invoke notification to send an email.
+-   Once Daily: Cleaner-Reader-Filter-Writer.
 
-The writer creates a static HTML web site with indices organized by court, docket, and date.
+-   One additional time during the day: Reader.
 
-Configuration
-=============
+The RSS feed holds precisely 24 hours of docket items.
+Running once each day means that a tiny scheduling offset between AOUSC and FeeaderReader could
+miss something. Running the reader step only prevents missing something in the very likely
+event of scheduling offsets between the data producer and this consumer.
 
-There are two configuration files:
+There are two operating modes: Local and Cloud.
+
+Local Operations
+================
+
+There are two parts:
+
+-   `Local Configuration`_
+
+-   `Local Monitor`_
+
+First, create the required two configuration files.
+
+Then, with a terminal window, run the monitor.
+
+Local Configuration
+-------------------
+
+Local operations uses two separate configuration files:
 
 -   The current working directory has a ``config.toml`` with most of the configuration details.
 
@@ -30,37 +48,15 @@ There are two configuration files:
 
 A ``config.toml`` file can look like this:
 
-..  code-block:: toml
 
-    [cleaner]
-        days_ago = 90
+..  include:: ../config.toml
+    :code: toml
 
-    [reader]
-        base_directory = "data"
-        feeds = [
-            "https://ecf.dcd.uscourts.gov/cgi-bin/rss_outside.pl",
-            "https://ecf.nyed.uscourts.gov/cgi-bin/readyDockets.pl",
-            ## "https://ecf.cacd.uscourts.gov/cgi-bin/rss_outside.pl",
-            ## "https://ecf.nysd.uscourts.gov/cgi-bin/rss_outside.pl",
-        ]
-
-    [filter]
-        dockets = ["2:23-cv-04570-HG"]
-
-    [writer]
-        format = "html"  # Or md or csv
-        page_size = 20
-        base_directory = "output"
-
-    [notifier.smtp]
-        # details here.
-
-    [monitor]
-        every = ["07:00", "20:00"]
-
-The ``data`` and ``output`` directories named in the config
-*must* exist before running any of the programs.
-The app does *not* create these two top-level directories.
+The ``[reader]`` and ``[writer]`` tables have ``base_directory`` values.
+These are file system paths. In the example, it uses
+The ``data`` and ``output`` local directories.
+These *must* exist before running any of the programs.
+The app does *not* create the top-level directories.
 
 The ``~/fdrdr_config.toml`` file can look like this:
 
@@ -87,10 +83,8 @@ It helps to change the mode to make the file only accessible by the owner.
 
 This reduces the possibility of compromise.
 
-General Monitoring
-==================
-
-First, create the required two configuration files.
+Local Monitor
+-------------
 
 Open a terminal window to use the command line interface (CLI).
 
@@ -104,25 +98,42 @@ Once this starts, the terminal window can be safely ignored. Don't close it. Jus
 
 To stop it, use **Control-C** in the terminal window.
 
-Individual Steps
-================
+Cloud Operation
+===============
 
-Cleaning and Reading is all in one place:
+This section is **TBD**.
 
-..  code-block:: bash
+To run this in AWS, the cloud resources need to be allocated.
 
-    % python src/reader.py
+-   Create the S3 Bucket used for storage. (Elastic FileSystem is another possibility here.)
 
+    See https://docs.aws.amazon.com/AmazonS3/latest/userguide/create-bucket-overview.html
 
-Filtering:
+    See https://docs.aws.amazon.com/AmazonS3/latest/userguide/security.html
 
-..  code-block:: bash
+-   Make sure an Email address has been verified for sending email by SES.
 
-    % python src/filter.py
+    See https://docs.aws.amazon.com/ses/latest/dg/send-email.html
 
+-   Create the Lambda, providing the necessary ARN's as configuration parameters as environment variables.
 
-Writing:
+    See https://docs.aws.amazon.com/lambda/latest/dg/lambda-deploy-functions.html
 
-..  code-block:: bash
+    See https://docs.aws.amazon.com/lambda/latest/dg/lambda-python.html
 
-    % python src/writer.py
+-   Create the Lambda schedule using EventBridge.
+
+    See https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-run-lambda-schedule.html
+
+Monitoring
+----------
+
+See https://docs.aws.amazon.com/lambda/latest/dg/lambda-monitoring.html
+
+See https://docs.aws.amazon.com/AmazonS3/latest/userguide/monitoring-overview.html
+
+See https://docs.aws.amazon.com/ses/latest/dg/monitor-sending-activity.html
+
+Some additional considerations:
+
+-   Lambda execution produces a log. The logs are available in CloudWatch.

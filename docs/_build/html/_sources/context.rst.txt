@@ -11,18 +11,21 @@ There are several asynchronous parts to the processing.
 
     actor Journalist
     actor AOUSC
-    actor FeederReader as fr
 
     cloud Pacer {
         (RSS upload) as upload
+    }
+
+    cloud FeederReader {
         (RSS reader-filter-writer) as rfw
         (Notification) as note
         (HTML Pages) as web
     }
 
     AOUSC --> upload
-    fr --> rfw
-    fr --> note
+    upload <-- rfw
+    rfw --> web
+    rfw --> note
     Journalist --> note
     Journalist --> web
     @enduml
@@ -37,7 +40,7 @@ The sequence has the following outline.
 
     -   Read and save the RSS,
     -   Filter the saved RSS looking for dockets of interest,
-    -   Write several index pages with the details.
+    -   Write several index pages with the details,
 
 3.  The Journalist can be notified of an interesting case, and browse the index to see
     the cases organized by Docket.

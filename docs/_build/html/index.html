@@ -1,18 +1,16 @@
-
 <!DOCTYPE html>
 
-<html>
+<html lang="en" data-content_root="./">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <title>RSS FeederReader &#8212; RSS FDRDR 2024.1 documentation</title>
-    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="_static/alabaster.css" />
-    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
-    <script src="_static/jquery.js"></script>
-    <script src="_static/underscore.js"></script>
-    <script src="_static/doctools.js"></script>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=4f649999" />
+    <link rel="stylesheet" type="text/css" href="_static/alabaster.css?v=039e1c02" />
+    <script src="_static/documentation_options.js?v=db884f6e"></script>
+    <script src="_static/doctools.js?v=888ff710"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Context" href="context.html" />
@@ -33,7 +31,7 @@
           <div class="body" role="main">
             
   <section id="rss-feederreader">
-<h1>RSS FeederReader<a class="headerlink" href="#rss-feederreader" title="Permalink to this headline">¶</a></h1>
+<h1>RSS FeederReader<a class="headerlink" href="#rss-feederreader" title="Link to this heading">¶</a></h1>
 <p>The RSS FeederReader (RSS FDRDR) polls the various RSS feeds for the US Courts,
 uncovering changes, and filtering those changes for dockets
 of interest.</p>
@@ -49,36 +47,48 @@ of interest.</p>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="components.html">Components</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="components.html#monitor">Monitor</a></li>
+<li class="toctree-l2"><a class="reference internal" href="components.html#handler">Handler</a></li>
 <li class="toctree-l2"><a class="reference internal" href="components.html#reader">Reader</a></li>
 <li class="toctree-l2"><a class="reference internal" href="components.html#filter">Filter</a></li>
 <li class="toctree-l2"><a class="reference internal" href="components.html#writer">Writer</a></li>
 <li class="toctree-l2"><a class="reference internal" href="components.html#notification">Notification</a></li>
+<li class="toctree-l2"><a class="reference internal" href="components.html#model">Model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="components.html#common">Common</a></li>
+<li class="toctree-l2"><a class="reference internal" href="components.html#jinja-templates">Jinja Templates</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="code.html">Code</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="code.html#module-model">Model</a></li>
-<li class="toctree-l2"><a class="reference internal" href="code.html#module-common">Common</a></li>
-<li class="toctree-l2"><a class="reference internal" href="code.html#module-storage">Storage</a></li>
-<li class="toctree-l2"><a class="reference internal" href="code.html#module-notification">Notification</a></li>
-<li class="toctree-l2"><a class="reference internal" href="code.html#module-reader">Reader</a></li>
-<li class="toctree-l2"><a class="reference internal" href="code.html#module-filter">Filter</a></li>
-<li class="toctree-l2"><a class="reference internal" href="code.html#module-writer">Writer</a></li>
-<li class="toctree-l2"><a class="reference internal" href="code.html#module-monitor">Monitor</a></li>
+<li class="toctree-l2"><a class="reference internal" href="code.html#infrastructure">Infrastructure</a></li>
+<li class="toctree-l2"><a class="reference internal" href="code.html#storage-and-notification">Storage and Notification</a></li>
+<li class="toctree-l2"><a class="reference internal" href="code.html#applications">Applications</a></li>
+<li class="toctree-l2"><a class="reference internal" href="code.html#control">Control</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="install.html">Install</a></li>
-<li class="toctree-l1"><a class="reference internal" href="test.html">Test and Development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="test.html">Test and Development</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="test.html#testing">Testing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="test.html#documentation">Documentation</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="operate.html">Operate</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="operate.html#configuration">Configuration</a></li>
-<li class="toctree-l2"><a class="reference internal" href="operate.html#general-monitoring">General Monitoring</a></li>
-<li class="toctree-l2"><a class="reference internal" href="operate.html#individual-steps">Individual Steps</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operate.html#local-operations">Local Operations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operate.html#cloud-operation">Cloud Operation</a></li>
 </ul>
 </li>
 </ul>
 </div>
 </section>
+<section id="to-do">
+<h1>To Do<a class="headerlink" href="#to-do" title="Link to this heading">¶</a></h1>
+<div class="admonition-todo admonition">
+<p class="admonition-title">Todo</p>
+<p>This needs to be more cautious about reading from storage.</p>
+<p>We can’t reread stored history for every individual item.</p>
+</div>
+<p class="todo-source">(The <a class="reference internal" href="code.html#id1"><em>original entry</em></a> is located in /Users/slott/github/local/FeederReader/docs/../src/reader.py:docstring of reader, line 64.)</p>
+</section>
 <section id="indices-and-tables">
-<h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">¶</a></h1>
+<h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Link to this heading">¶</a></h1>
 <ul class="simple">
 <li><p><a class="reference internal" href="genindex.html"><span class="std std-ref">Index</span></a></p></li>
 <li><p><a class="reference internal" href="py-modindex.html"><span class="std std-ref">Module Index</span></a></p></li>
@@ -131,7 +141,7 @@ of interest.</p>
     </form>
     </div>
 </div>
-<script>$('#searchbox').show(0);</script>
+<script>document.getElementById('searchbox').style.display = "block"</script>
 
 
 
@@ -148,7 +158,7 @@ of interest.</p>
       &copy;2023, S.Lott.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 4.4.0</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 7.2.6</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.13</a>
       
       |

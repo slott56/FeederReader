@@ -19,7 +19,11 @@
     base_directory = "output"
 
 [notifier.smtp]
-    # details here.
+    # Details found in ~/fdrdr_config.toml
+
+[notifier.ses]
+    admin = "admin@domain.smtp.your_host"
+    send_to = "slott56@gmail.com"
 
 [monitor]
     every = ["07:00", "20:00"]

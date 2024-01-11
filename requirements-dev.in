@@ -1,5 +1,5 @@
 pip-tools
 sphinx
-# sphinx-plantuml  # Needs to have the version rules relaxed (https://github.com/zqmillet/sphinx-plantuml/pull/4)
+sphinxcontrib-plantuml
 black
 mypy

@@ -1,6 +1,67 @@
-"""Data Model for the Feeder Reader.
+"""
+Data Model for the Feeder Reader.
 
-..  note:
+
+..  plantuml::
+
+    @startuml
+
+    component pydantic {
+        class BaseModel
+    }
+
+    component model {
+
+    class Item {
+        title: str
+        link: URL
+        description: str
+        pub_date: datetime
+
+        {static} from_tag(xml)
+    }
+    BaseModel <|-- Item
+
+    class Channel {
+        title: str
+        link: URL
+
+        {static} from_tag(xml)
+    }
+    BaseModel <|-- Channel
+
+    Channel *-- "1,m" Item
+
+    class USCourtItem {
+        docket: str
+        parties: str
+
+        {static} from_tag(xml)
+    }
+    BaseModel <|-- USCourtItem
+
+    Item <|-- USCourtItem
+
+    class USCourtItemDetail {
+        item: USCourtItem
+        channel: Channel
+    }
+    BaseModel <|-- USCourtItemDetail
+
+    USCourtItem <-- USCourtItemDetail /' --> USCourtItem '/
+    Channel <-- USCourtItemDetail     /' --> Channel '/
+    }
+
+    hide empty members
+
+    @enduml
+
+
+..  references:
+    components.rst expects lines 4 to 47 have the diagram. Note zero-based numbering.
+    In the IDE editor it looks like lines 5 to 48.
+
+..  note::
 
     A docket number may be composed of a number or letter indicating the court,
     a two-digit number to identify the year,
@@ -20,9 +81,11 @@ from pydantic.networks import AnyUrl
 
 
 class Channel(BaseModel, frozen=True):
-    """Overall Channel summary.
+    """The channel definition from the RSS source.
 
-    ::
+    For example,
+
+    ..  code-block:: xml
 
         <rss version="2.0">
         <channel>
@@ -34,15 +97,23 @@ class Channel(BaseModel, frozen=True):
         </channel>
         </rss>
 
+    The :py:meth:`from_tag` method only preserves the title and link
+    information.
     """
 
-    title: str
-    link: AnyUrl
+    title: str  #: RSS feed title
+    link: AnyUrl  #: RSS feed link
     # description: str
     # last_build: datetime.datetime
 
     @classmethod
     def from_tag(cls, tag: ElementTree.Element) -> "Channel":
+        """
+        Extracts the individual field values from the XML tag.
+
+        :param tag: The XML tag for a channel.
+        :return: New :py:class:`Channel` instance.
+        """
         title = (tag.findtext("title") or "").strip()
         link = (tag.findtext("link") or "").strip()
         # description = (tag.findtext("description") or "").strip()
@@ -59,9 +130,11 @@ class Channel(BaseModel, frozen=True):
 
 
 class Item(BaseModel, frozen=True):
-    """One RSS items from within a channel.
+    """One item from within a channel extracted from the RSS source.
 
-    ::
+    For example,
+
+    ..  code-block:: xml
 
         <item>
         <title>
@@ -78,19 +151,26 @@ class Item(BaseModel, frozen=True):
 
     """
 
-    title: str
-    link: AnyUrl
-    description: str
-    text_pub_date: str
+    title: str  #: RSS feed title
+    link: AnyUrl  #: RSS feed link
+    description: str  #: RSS feed description
+    text_pub_date: str  #: RSS feed publication date
 
     @property
     def pub_date(self) -> datetime.datetime:
+        """Parse the publication date."""
         return datetime.datetime.strptime(
             self.text_pub_date, "%a, %d %b %Y %H:%M:%S %Z"
         )
 
     @classmethod
     def parse(cls, tag: ElementTree.Element) -> dict[str, Any]:
+        """
+        Parse the individual fields to create an interim mapping.
+
+        :param tag: the XML tag
+        :returns: a dictionary with fields and values.
+        """
         return dict(
             title=(tag.findtext("title") or "").strip(),
             link=(tag.findtext("link") or "").strip(),
@@ -100,6 +180,12 @@ class Item(BaseModel, frozen=True):
 
     @classmethod
     def from_tag(cls, tag: ElementTree.Element) -> "Item":
+        """
+        Extracts the individual field values from the XML tag.
+
+        :param tag: The XML tag for an item.
+        :return: New :py:class:`Item` instance.
+        """
         parsed = cls.parse(tag)
         return Item(
             title=parsed["title"],
@@ -110,13 +196,30 @@ class Item(BaseModel, frozen=True):
 
 
 class USCourtItem(Item, frozen=True):
-    """Decompose an Item tag content to get Docket and Parties from the Title."""
+    """
+    Decompose an Item tag content to get Docket and Parties from the Title.
 
-    docket: str | None
-    parties: str | None
+    Generally the title has a docket string followed by the parties.
+
+    ::
+
+        2:23-cv-09491-PKC-ST Sookra v. Berkeley Carroll School et al
+
+    The ``2:23-cv-09491-PKC-ST`` is the docket.
+    The remaining portion name the parties.
+    """
+
+    docket: str | None  #: Docket extracted from the title
+    parties: str | None  #: Parties extracted from the title.
 
     @classmethod
     def from_tag(cls, tag: ElementTree.Element) -> "USCourtItem":
+        """
+        Extracts the individual field values from the XML tag.
+
+        :param tag: The XML tag for an item.
+        :return: New :py:class:`USCourtItem` instance.
+        """
         parsed = cls.parse(tag)
         docket_pattern = re.compile(
             r"^(?P<docket>.+:\d+-\w+-\d+.*?)\s+(?P<parties>.*)$"
@@ -140,5 +243,9 @@ Feed: TypeAlias = Iterator[USCourtItem | Channel]
 
 
 class USCourtItemDetail(BaseModel, frozen=True):
-    item: USCourtItem
-    channel: Channel
+    """
+    An item and the channel for this item.
+    The two are bound together to make sure the overall court information is kept with each item.
+    """
+    item: USCourtItem  #: The item from the RSS feed.
+    channel: Channel  #: The channel to which the item belongs.

@@ -14,6 +14,7 @@ from xml.etree import ElementTree
 from pydantic.networks import Url
 import pytest
 
+import common
 import reader
 
 
@@ -126,7 +127,7 @@ def test_reader(
 ):
     caplog.set_level(logging.INFO)
     monkeypatch.setattr(
-        reader, "LocalFileStorage", Mock(return_value=mock_storage_noprev)
+        common, "get_class", Mock(return_value=Mock(return_value=mock_storage_noprev))
     )
     mock_feed_iter = Mock(return_value=sentinel.FEED)
     monkeypatch.setattr(reader, "feed_iter", mock_feed_iter)
@@ -179,7 +180,7 @@ def test_cleaner(
     caplog.set_level(logging.INFO)
     monkeypatch.setattr(reader, "datetime", mock_datetime)
     monkeypatch.setattr(
-        reader, "LocalFileStorage", Mock(return_value=mock_storage_content)
+        common, "get_class", Mock(return_value=Mock(return_value=mock_storage_content))
     )
     reader.cleaner()
     assert caplog.text.splitlines() == [

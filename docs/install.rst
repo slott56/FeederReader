@@ -4,30 +4,30 @@ Install
 
 This is not in PyPI and **cannot** be installed with PIP.
 
-The installation works like this.
+The installation requires **git**. For building a Python environment, we suggest **conda**.
 
-1.  Use git to clone the repository.
+Download and install GIT: https://git-scm.com/book/en/v2/Getting-Started-Installing-Git
 
-2.  Install Python.
+Download and install mini-conda: https://docs.conda.io/projects/miniconda/en/latest/miniconda-install.html
 
-3.  Use the following command to install the dependencies.
+1.  Use **git** to clone the repository.
 
-    :: bash
+    ..  code-block:: bash
+
+        git clone https://github.com/slott56/FeederReader.git
+
+2.  Use **conda** to install Python 3.12. (There are many other ways to install Python. This seems simplest.)
+
+    ..  code-block:: bash
+
+        conda --create=fdrdr python=3.12 --channel=conda-forge
+        conda activate fdrdr
+
+3.  Use **PIP** to install the dependencies.
+
+    ..  code-block:: bash
 
         python -m pip install -r requirements.txt
 
-For testing or development, additional installations are required.
-Testing needs this.
-
-:: bash
-
-    python -m pip install -r requirements-test.txt
-
-Development needs this.
-
-:: bash
-
-    python -m pip install -r requirements-dev.txt
-
-There are two locations for configuration files that are often edited as part of installation.
-These are addressed in the Operations section.
+At this point, the Feeder Reader is ready for operating locally, installing in the cloud,
+or doing testing and development.

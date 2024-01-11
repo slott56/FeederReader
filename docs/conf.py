@@ -17,7 +17,11 @@ release = '2024.1'
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
 
-extensions = ['sphinx.ext.autodoc', 'sphinxcontrib.plantuml']
+extensions = [
+    'sphinx.ext.autodoc',
+    'sphinxcontrib.plantuml',
+    'sphinx.ext.todo',
+]
 
 templates_path = ['_templates']
 exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
@@ -36,3 +40,9 @@ html_static_path = ['_static']
 # https://www.sphinx-doc.org/en/master/usage/extensions/autodoc.html#configuration
 
 autodoc_member_order = 'bysource'
+autodoc_typehints = 'description'
+
+# -- Options for TODO  -------------------------------------------------
+# https://www.sphinx-doc.org/en/master/usage/extensions/todo.html#configuration
+
+todo_include_todos = True

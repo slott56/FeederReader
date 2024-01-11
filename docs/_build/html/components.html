@@ -1,18 +1,16 @@
-
 <!DOCTYPE html>
 
-<html>
+<html lang="en" data-content_root="./">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <title>Components &#8212; RSS FDRDR 2024.1 documentation</title>
-    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="_static/alabaster.css" />
-    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
-    <script src="_static/jquery.js"></script>
-    <script src="_static/underscore.js"></script>
-    <script src="_static/doctools.js"></script>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=4f649999" />
+    <link rel="stylesheet" type="text/css" href="_static/alabaster.css?v=039e1c02" />
+    <script src="_static/documentation_options.js?v=db884f6e"></script>
+    <script src="_static/doctools.js?v=888ff710"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Code" href="code.html" />
@@ -34,22 +32,33 @@
           <div class="body" role="main">
             
   <section id="components">
-<h1>Components<a class="headerlink" href="#components" title="Permalink to this headline">¶</a></h1>
+<h1>Components<a class="headerlink" href="#components" title="Link to this heading">¶</a></h1>
 <p>We have the following software architecture.</p>
 <figure class="align-default">
-<img alt="https://www.plantuml.com/plantuml/svg/RP9R2iCW44N_PnLk85r2oLP4noBrXPbIIkdUEqt1jn_1dAjdVEq7oKmFxm2IL7TvGs4GDUQCah_Y3OARYZx5W864ZnhT9Rq6p3qVmymFYfcTSn0YMMEL9BkQzYy-SsCThVWpsoNdDLbUmI_u0DG_iMtNfiWGr2f3KCj06NC6uswWkC-u75e_g-3YxV5WgMVSQohlFPKFekPIUbCJzAecW1s3vlVo1G==" src="https://www.plantuml.com/plantuml/svg/RP9R2iCW44N_PnLk85r2oLP4noBrXPbIIkdUEqt1jn_1dAjdVEq7oKmFxm2IL7TvGs4GDUQCah_Y3OARYZx5W864ZnhT9Rq6p3qVmymFYfcTSn0YMMEL9BkQzYy-SsCThVWpsoNdDLbUmI_u0DG_iMtNfiWGr2f3KCj06NC6uswWkC-u75e_g-3YxV5WgMVSQohlFPKFekPIUbCJzAecW1s3vlVo1G==" />
+<img alt="https://www.plantuml.com/plantuml/svg/RP9T2iCW48JVznHUe3r2oLKaRbgfFy5OIYczUvS4N7TD7aASpvqPejDMRQcl601MEp_j7Ss2wB0KjFGsNp3qp3ckEM6g9cQ7uRf-b4nVCQTHtsekv3c2bAjV_6ohFnixmaTzyQ6UwU_YJtNgvAd121uskN1C_01uPIwNMvUk0CShmFd0aSfB0VPIeFDgUtQWVnaqxnstav5JJMw-KbOktO59dmv8fmw0ghXplXgyKm5PWNNPW7LPW7MOC3cwoty=" src="https://www.plantuml.com/plantuml/svg/RP9T2iCW48JVznHUe3r2oLKaRbgfFy5OIYczUvS4N7TD7aASpvqPejDMRQcl601MEp_j7Ss2wB0KjFGsNp3qp3ckEM6g9cQ7uRf-b4nVCQTHtsekv3c2bAjV_6ohFnixmaTzyQ6UwU_YJtNgvAd121uskN1C_01uPIwNMvUk0CShmFd0aSfB0VPIeFDgUtQWVnaqxnstav5JJMw-KbOktO59dmv8fmw0ghXplXgyKm5PWNNPW7LPW7MOC3cwoty=" />
 </figure>
-<p>Some of these modules are stand-alone applications.</p>
+<p>Note the four tiers:</p>
 <ul class="simple">
-<li><p>Monitor</p></li>
-<li><p>Reader</p></li>
-<li><p>Filter</p></li>
-<li><p>Writer</p></li>
+<li><p><strong>Control</strong>. At the top are monitor (to run locally) and handler (to run as an AWS lambda.)</p></li>
+<li><p><strong>Application</strong>. The top-tier relies on the applications: reader, writer, filter.
+The application modules are also stand-alone applications and can be executed
+individually from the command line.</p></li>
+<li><p><strong>Storage and Notification</strong>. The application modules rely on storage and notification: model, storage, notification.</p></li>
+<li><p><strong>Infrastructure</strong>. All of the commonments rely on the common module which provides configuration details.</p></li>
 </ul>
-<p>We’ll look at each in a little more detail.</p>
+<p>These rest on a number of dependencies, listed in the <code class="docutils literal notranslate"><span class="pre">requirements.in</span></code>.</p>
+<ul class="simple">
+<li><p>pydantic. Used to define the model class in <a class="reference internal" href="code.html#module-model" title="model"><code class="xref py py-mod docutils literal notranslate"><span class="pre">model</span></code></a>.</p></li>
+<li><p>requests. Used to capture RSS feed in <a class="reference internal" href="code.html#module-reader" title="reader"><code class="xref py py-mod docutils literal notranslate"><span class="pre">reader</span></code></a>.</p></li>
+<li><p>jinja2. Used to create HTML documents in <a class="reference internal" href="code.html#module-writer" title="writer"><code class="xref py py-mod docutils literal notranslate"><span class="pre">writer</span></code></a> and <a class="reference internal" href="code.html#module-notification" title="notification"><code class="xref py py-mod docutils literal notranslate"><span class="pre">notification</span></code></a>.</p></li>
+<li><p>schedule. Used by the <a class="reference internal" href="code.html#module-monitor" title="monitor"><code class="xref py py-mod docutils literal notranslate"><span class="pre">monitor</span></code></a> to control a recurring task.</p></li>
+<li><p>boto3 and botocore. Used to manage AWS resources in <a class="reference internal" href="code.html#module-storage" title="storage"><code class="xref py py-mod docutils literal notranslate"><span class="pre">storage</span></code></a> and <a class="reference internal" href="code.html#module-notification" title="notification"><code class="xref py py-mod docutils literal notranslate"><span class="pre">notification</span></code></a>.</p></li>
+</ul>
+<p>We’ll look at each componment in a little more detail.</p>
 <section id="monitor">
-<h2>Monitor<a class="headerlink" href="#monitor" title="Permalink to this headline">¶</a></h2>
-<p>The monitor executes the feeder reader using its own internal scheduler.</p>
+<h2>Monitor<a class="headerlink" href="#monitor" title="Link to this heading">¶</a></h2>
+<p>The monitor executes the feeder reader using its own internal scheduler.
+This is used when running locally.</p>
 <figure class="align-default">
 <img alt="https://www.plantuml.com/plantuml/svg/LOzB2iCm34JtEeMMxHMSJLOzG2zGN7lS21mxA4wpABbx7KFw6H28Ds8OzNEnMfOn4hMDo2YiPvTJa0VT5ucUPpV0Bn4TaMA2BMpg7DHpaN7tk6gg6L8a9xu07dgxrZGelvgxoxW8cw3TbsYx-G51Ola3gye7R4UBTP08FeMiU4BFH3sIhw-y0G==" src="https://www.plantuml.com/plantuml/svg/LOzB2iCm34JtEeMMxHMSJLOzG2zGN7lS21mxA4wpABbx7KFw6H28Ds8OzNEnMfOn4hMDo2YiPvTJa0VT5ucUPpV0Bn4TaMA2BMpg7DHpaN7tk6gg6L8a9xu07dgxrZGelvgxoxW8cw3TbsYx-G51Ola3gye7R4UBTP08FeMiU4BFH3sIhw-y0G==" />
 </figure>
@@ -57,12 +66,26 @@
 It consumes very few resources, and can be left running in a terminal window.
 It can be started or stopped as needed.</p>
 </section>
+<section id="handler">
+<h2>Handler<a class="headerlink" href="#handler" title="Link to this heading">¶</a></h2>
+<p>The handler is used to execute the feeder reader when it’s deployed as as AWS lambda.
+The AWS lambda is triggered by a lambda scheduler to periodically perform the various
+tasks.</p>
+<p>This is used when running locally.</p>
+<figure class="align-default">
+<img alt="https://www.plantuml.com/plantuml/svg/LOvD2eDG38JtEKMMxHLquwe7w0NAmpTY83ubnheelNlZW_uDX0dVp6AwrPFvDYbH_OWC2v9p4xVs8_AcoEmoeINYq18jSPaBNu0CkrsHmlXHqqDDhqW5rdw9rSuF64Jz3-mc7_1yhzX7KV1fc0rts9ceGyanzWK=" src="https://www.plantuml.com/plantuml/svg/LOvD2eDG38JtEKMMxHLquwe7w0NAmpTY83ubnheelNlZW_uDX0dVp6AwrPFvDYbH_OWC2v9p4xVs8_AcoEmoeINYq18jSPaBNu0CkrsHmlXHqqDDhqW5rdw9rSuF64Jz3-mc7_1yhzX7KV1fc0rts9ceGyanzWK=" />
+</figure>
+<p>To change the schedule, an AWS console is used.
+A Cloud Formation Template (CLT) can define the resources and the schedule.</p>
+</section>
 <section id="reader">
-<h2>Reader<a class="headerlink" href="#reader" title="Permalink to this headline">¶</a></h2>
+<h2>Reader<a class="headerlink" href="#reader" title="Link to this heading">¶</a></h2>
 <p>The reader consumes data from USCourts RSS feeds and captures it locally.</p>
 <figure class="align-default">
-<img alt="https://www.plantuml.com/plantuml/svg/JOyz3u9038Rt_ehcTXmS7Gn61XPY8d5mh5nDCCSTtiTW3F_T4X3eqBJFcxvjyn39nzGPWCPrlRDi8tecpLw8SKdZwNAhp_W5b7YsXl5QrslZzqW1bJ050u2cI0yAZ6Fn7t96xF0kKLL5CTEDKfORjZYtaRkmUmLd5ss0ASkYwQeiouxpkNX0zKxiFmfcC6ghoQWtrCVaMG7aRBLy_GC=" src="https://www.plantuml.com/plantuml/svg/JOyz3u9038Rt_ehcTXmS7Gn61XPY8d5mh5nDCCSTtiTW3F_T4X3eqBJFcxvjyn39nzGPWCPrlRDi8tecpLw8SKdZwNAhp_W5b7YsXl5QrslZzqW1bJ050u2cI0yAZ6Fn7t96xF0kKLL5CTEDKfORjZYtaRkmUmLd5ss0ASkYwQeiouxpkNX0zKxiFmfcC6ghoQWtrCVaMG7aRBLy_GC=" />
+<img alt="https://www.plantuml.com/plantuml/svg/JP2x3i8m34LtVuMLFGoC2A4YEdH1I5GCZAOngAXDIXu3GlrtKXhQUeYJOryxTkOyMH_Q1g0oRMSqQu-MIR5T0EUDfGV7dCO4XVlJfJpW1p3QlMuOpsKvF-mQoQ68J40FeCZJZHpZSFcBJ1CRu3NQyPZdYIuYHR5WK-NQS-jMJsVq5EjXF6EZyLTRAMKQ03SeNe7jMq02KkwcMPB_iRdmeAceyy6o0CXOgxYRBm==" src="https://www.plantuml.com/plantuml/svg/JP2x3i8m34LtVuMLFGoC2A4YEdH1I5GCZAOngAXDIXu3GlrtKXhQUeYJOryxTkOyMH_Q1g0oRMSqQu-MIR5T0EUDfGV7dCO4XVlJfJpW1p3QlMuOpsKvF-mQoQ68J40FeCZJZHpZSFcBJ1CRu3NQyPZdYIuYHR5WK-NQS-jMJsVq5EjXF6EZyLTRAMKQ03SeNe7jMq02KkwcMPB_iRdmeAceyy6o0CXOgxYRBm==" />
 </figure>
+<p>The <code class="docutils literal notranslate"><span class="pre">storage</span></code> module will either use an AWS S3 bucket or it will
+use local file storage.</p>
 <p>Here’s a more detailed view of the processing.</p>
 <figure class="align-default">
 <img alt="https://www.plantuml.com/plantuml/svg/PP31JWGX38RlVOeUTrzXvh96BoPwCYPUMQOuDGnbeSGOi-zkXsmcet8WmFV_vMzFLLtHjaI0VWB8jhEo9FIHNAA2tp0KSXDwIO7VHu2X4vGuOU18TOJhthUAk-slhr0cfpW4AKZEpnY89dj7MuEfQbi8TIPyUtx2Agrukj5_JbPQRgoxpuqjpUlBlRdqqU03gUE8SluWhpib1poqn9T6n_MhjDqsHQztbpEb2LLmvgfIldgduoOooE5Nji_P17XOf51FLuzRmtkqjcpekivRCi39AjduVm0=" src="https://www.plantuml.com/plantuml/svg/PP31JWGX38RlVOeUTrzXvh96BoPwCYPUMQOuDGnbeSGOi-zkXsmcet8WmFV_vMzFLLtHjaI0VWB8jhEo9FIHNAA2tp0KSXDwIO7VHu2X4vGuOU18TOJhthUAk-slhr0cfpW4AKZEpnY89dj7MuEfQbi8TIPyUtx2Agrukj5_JbPQRgoxpuqjpUlBlRdqqU03gUE8SluWhpib1poqn9T6n_MhjDqsHQztbpEb2LLmvgfIldgduoOooE5Nji_P17XOf51FLuzRmtkqjcpekivRCi39AjduVm0=" />
@@ -73,40 +96,97 @@ It can be started or stopped as needed.</p>
 </figure>
 <p>The files are decomposed by day to make it easy to clean up old files.
 Within a day, they’re decomposed by hour to make the files small and fast to process.</p>
-<p>Within a JSON file (either an <code class="docutils literal notranslate"><span class="pre">items.json</span></code> or <code class="docutils literal notranslate"><span class="pre">filter.json</span></code>) the structure is
-as follows</p>
-<figure class="align-default">
-<img alt="https://www.plantuml.com/plantuml/svg/XL512i8m4Bpd5Jdg8Hy88e9U14-AvnBJLHUJj2HR4DI_cwOfRL5e3Y4xsPt9J3Q1bAV66iQqKI7mysbRDPxs17O7fD3m5-DnOGJa-3QX-gwS0oFvjZkmJy_JjkHHGZ8WUI2VIeFk4PcEXrIL4BJ7ch1oGqlTN8fIKHngTq8BBE6l-5f2_U5NNzc2r6tnj6OvY8wUbxNBIZ-0HipHBKBeW1dEHBDw2p6ndQMouJcBCn8_QKlP1is5M4z5_pJcx5Dl7p_RW2lZRtu1" src="https://www.plantuml.com/plantuml/svg/XL512i8m4Bpd5Jdg8Hy88e9U14-AvnBJLHUJj2HR4DI_cwOfRL5e3Y4xsPt9J3Q1bAV66iQqKI7mysbRDPxs17O7fD3m5-DnOGJa-3QX-gwS0oFvjZkmJy_JjkHHGZ8WUI2VIeFk4PcEXrIL4BJ7ch1oGqlTN8fIKHngTq8BBE6l-5f2_U5NNzc2r6tnj6OvY8wUbxNBIZ-0HipHBKBeW1dEHBDw2p6ndQMouJcBCn8_QKlP1is5M4z5_pJcx5Dl7p_RW2lZRtu1" />
-</figure>
+<p>Within a JSON file (either an <code class="docutils literal notranslate"><span class="pre">items.json</span></code> or <code class="docutils literal notranslate"><span class="pre">filter.json</span></code>) the structure saved
+is a sequence of <code class="docutils literal notranslate"><span class="pre">USCourtItemDetail</span></code> instances. See <a class="reference internal" href="#model">Model</a> for more on this data structure.</p>
 </section>
 <section id="filter">
-<h2>Filter<a class="headerlink" href="#filter" title="Permalink to this headline">¶</a></h2>
+<h2>Filter<a class="headerlink" href="#filter" title="Link to this heading">¶</a></h2>
 <p>The filter examines the captured JSON files, examining all of the  <code class="docutils literal notranslate"><span class="pre">USCourtItemDetail</span></code>
 instances. The that match the docket information are written to a
 separate file, <code class="docutils literal notranslate"><span class="pre">filter.json</span></code>.</p>
 <figure class="align-default">
-<img alt="https://www.plantuml.com/plantuml/svg/JOyz3i8m38LtdyBA7Ww04EhGeKiFm6Y8AmNb1oL635NlJjf06m-M_RxtPBdBGadUtW4yed_5m45miauu0HWIkbDcN0US0KjDqHbEU2irZdt_Knio38sswTOnMc6VJyySmyuMEFhcgMUhQG6eArwqRj9uHfMOZFfZhQzjSEMVLFmAeEDWocTV" src="https://www.plantuml.com/plantuml/svg/JOyz3i8m38LtdyBA7Ww04EhGeKiFm6Y8AmNb1oL635NlJjf06m-M_RxtPBdBGadUtW4yed_5m45miauu0HWIkbDcN0US0KjDqHbEU2irZdt_Knio38sswTOnMc6VJyySmyuMEFhcgMUhQG6eArwqRj9uHfMOZFfZhQzjSEMVLFmAeEDWocTV" />
+<img alt="https://www.plantuml.com/plantuml/svg/PP0x3i8m38PtdyBg7Ww04EhGeKiFm1Y8YuBoG8aH0-hToQEqaV3Ws9_zsrRwo3Bmong0cxTFxyWnpjemXGP4za7U2K19bbSP2NE07y1aipUA0bwIJTCmhBIfZ6F32jU6K3FPU7X4xxRQ0hilFVMGshG0r1HFGcmNhMzX-qGyOXT8gkud4UBy9yciMP0rxv1cT00zEPN-v0i=" src="https://www.plantuml.com/plantuml/svg/PP0x3i8m38PtdyBg7Ww04EhGeKiFm1Y8YuBoG8aH0-hToQEqaV3Ws9_zsrRwo3Bmong0cxTFxyWnpjemXGP4za7U2K19bbSP2NE07y1aipUA0bwIJTCmhBIfZ6F32jU6K3FPU7X4xxRQ0hilFVMGshG0r1HFGcmNhMzX-qGyOXT8gkud4UBy9yciMP0rxv1cT00zEPN-v0i=" />
 </figure>
 <p>Any changes to the filter file are important.
-A notification strategy is provided in the <code class="xref py py-mod docutils literal notranslate"><span class="pre">notification</span></code> module.</p>
+A notification strategy is provided in the <a class="reference internal" href="code.html#module-notification" title="notification"><code class="xref py py-mod docutils literal notranslate"><span class="pre">notification</span></code></a> module.</p>
+<p>Within these JSON files (either <code class="docutils literal notranslate"><span class="pre">history.json</span></code> or <code class="docutils literal notranslate"><span class="pre">filter.json</span></code>) the structure saved
+is a sequence of <code class="docutils literal notranslate"><span class="pre">USCourtItemDetail</span></code> instances. See <a class="reference internal" href="#model">Model</a> for more on this data structure.</p>
 </section>
 <section id="writer">
-<h2>Writer<a class="headerlink" href="#writer" title="Permalink to this headline">¶</a></h2>
+<h2>Writer<a class="headerlink" href="#writer" title="Link to this heading">¶</a></h2>
 <p>The writer builds a web site from the captured files.</p>
 <figure class="align-default">
-<img alt="https://www.plantuml.com/plantuml/svg/ZL4n3eCm3Dpz2YixFA13nS30mWCwfiIej92WnAYLAlxU12AWHQh8O2LtFfzopXnBoqFN0bIcwuqcpVYq3PC5K9BbLJh2SC4te3-rQHLPlFXJbdaUqGrJ51jimfkMq0_iN7ftHY_S26kTUdpnjdFJ213dcO7xWR_TApDOtbe7UTMWT2WQhUYLthXhnTPW5YfJFMYdL4UKaccdumF2-LU_qlglSafieK8OQtwO9CavhWXFA2n99I2-0nK3yzG42e2CjF8h_W0=" src="https://www.plantuml.com/plantuml/svg/ZL4n3eCm3Dpz2YixFA13nS30mWCwfiIej92WnAYLAlxU12AWHQh8O2LtFfzopXnBoqFN0bIcwuqcpVYq3PC5K9BbLJh2SC4te3-rQHLPlFXJbdaUqGrJ51jimfkMq0_iN7ftHY_S26kTUdpnjdFJ213dcO7xWR_TApDOtbe7UTMWT2WQhUYLthXhnTPW5YfJFMYdL4UKaccdumF2-LU_qlglSafieK8OQtwO9CavhWXFA2n99I2-0nK3yzG42e2CjF8h_W0=" />
+<img alt="https://www.plantuml.com/plantuml/svg/ZL913e8m4BplApQzmmCy60uUkFW0ZvKkYa9BscqqCVpTWe154iCUscPcPoUPRUPOMlPD3L2OfZMQDEF3Lams0XmRAoy4e2JBitI4_GDVWA5AKokoU0frF1uE8nenUHvX0rxLXC6YSUdD6Jrp7NpEBZ8odblFIwl2UCknJp-lg50w59LMz4oltDG2lZD7eJB5dLPAjKKfcLOwtY0CdI7BNsdvLpd4CrDz7D-mC4cI_RGGn1qAIr89c92U7VVtkJ3gNtIDoOO9GwC0o4Yhy1NU" src="https://www.plantuml.com/plantuml/svg/ZL913e8m4BplApQzmmCy60uUkFW0ZvKkYa9BscqqCVpTWe154iCUscPcPoUPRUPOMlPD3L2OfZMQDEF3Lams0XmRAoy4e2JBitI4_GDVWA5AKokoU0frF1uE8nenUHvX0rxLXC6YSUdD6Jrp7NpEBZ8odblFIwl2UCknJp-lg50w59LMz4oltDG2lZD7eJB5dLPAjKKfcLOwtY0CdI7BNsdvLpd4CrDz7D-mC4cI_RGGn1qAIr89c92U7VVtkJ3gNtIDoOO9GwC0o4Yhy1NU" />
 </figure>
+<p>The source JSON files (either <code class="docutils literal notranslate"><span class="pre">history.json</span></code> or <code class="docutils literal notranslate"><span class="pre">filter.json</span></code>) the structure saved
+is a sequence of <code class="docutils literal notranslate"><span class="pre">USCourtItemDetail</span></code> instances. See <a class="reference internal" href="#model">Model</a> for more on this data structure.</p>
+<p>The output files are created with Jinja templates. See <a class="reference internal" href="#jinja-templates">Jinja Templates</a> for more information.</p>
 </section>
 <section id="notification">
-<h2>Notification<a class="headerlink" href="#notification" title="Permalink to this headline">¶</a></h2>
+<h2>Notification<a class="headerlink" href="#notification" title="Link to this heading">¶</a></h2>
 <p>Choices involve</p>
 <blockquote>
 <div><ul class="simple">
-<li><p>SMTP from a local computer</p></li>
-<li><p>SNS when deployed in an AWS lambda</p></li>
-<li><p>A fancy Text User Interface (TUI) application to show status and notifications</p></li>
+<li><p>SMTP on a local computer.</p></li>
+<li><p>SES when deployed in an AWS lambda.</p></li>
+<li><p>A fancy Text User Interface (TUI) application to show status and notifications.</p></li>
 </ul>
 </div></blockquote>
+<p>Other choices include a simple log file or using AWS SNS for notifications.</p>
+<figure class="align-default">
+<img alt="https://www.plantuml.com/plantuml/svg/ROyn3i8m34LtdyBA14Clm82wiB7r12P9gqY9NRNEXBXxdGf49V1a_V_y9FUhqgArP00lPHQEhCYYQKoUD0aVOjkA1N2iiUkkxmBnWcwAZUCnJNNP0MVYB3NW4z3cQnjk0xm0JcTSYyv_h0OquvtA8v3xxTlP3eYdxA3XdnYWZnpigmq=" src="https://www.plantuml.com/plantuml/svg/ROyn3i8m34LtdyBA14Clm82wiB7r12P9gqY9NRNEXBXxdGf49V1a_V_y9FUhqgArP00lPHQEhCYYQKoUD0aVOjkA1N2iiUkkxmBnWcwAZUCnJNNP0MVYB3NW4z3cQnjk0xm0JcTSYyv_h0OquvtA8v3xxTlP3eYdxA3XdnYWZnpigmq=" />
+</figure>
+<p>The decision of which notification to use is a feature of the <code class="docutils literal notranslate"><span class="pre">common</span></code> module.</p>
+<p>The output files are created with Jinja templates. See <a class="reference internal" href="#jinja-templates">Jinja Templates</a> for more information.</p>
+</section>
+<section id="model">
+<h2>Model<a class="headerlink" href="#model" title="Link to this heading">¶</a></h2>
+<p>The model classes are built using <strong>Pydantic</strong>. This does data validation,
+and also handles serialization to and from JSON format.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">USCourtItemDetail</span></code> class is defined as follows:</p>
+<figure class="align-default">
+<img alt="https://www.plantuml.com/plantuml/svg/bLBBQiCm4BplLoovf2qreLSJIcbw2QINbfo3OcqR4JsCj8Q6DFzUMNxK9Y4G7GGQPcPdntu9B3nNHWCKpfJEacKi3r9OLWKU0UCfj0W1NqMWToT9msd8DJKKYT2mbaocbR5YJJa6zkcfbTtdkFvOfPUaK7XLidBsdr9MsuqK74NrpSeG9FmOGyOu9_popcnOVD_z67qVS_IPSFwRPMbu5sIn4zQcP5UptEJVUW9qvWyHd3mzcibezFfpuIhFWogaA_R4WqLZvuf20zmKOU0Da2QSmsSfteY5wgfG4SX7WlIDcutoViThani_WE6YyqiKd4qnovv7ZKndVNsNDVLfTHqnQk9FjrEIa4p91pHajkJ37m==" src="https://www.plantuml.com/plantuml/svg/bLBBQiCm4BplLoovf2qreLSJIcbw2QINbfo3OcqR4JsCj8Q6DFzUMNxK9Y4G7GGQPcPdntu9B3nNHWCKpfJEacKi3r9OLWKU0UCfj0W1NqMWToT9msd8DJKKYT2mbaocbR5YJJa6zkcfbTtdkFvOfPUaK7XLidBsdr9MsuqK74NrpSeG9FmOGyOu9_popcnOVD_z67qVS_IPSFwRPMbu5sIn4zQcP5UptEJVUW9qvWyHd3mzcibezFfpuIhFWogaA_R4WqLZvuf20zmKOU0Da2QSmsSfteY5wgfG4SX7WlIDcutoViThani_WE6YyqiKd4qnovv7ZKndVNsNDVLfTHqnQk9FjrEIa4p91pHajkJ37m==" />
+</figure>
+</section>
+<section id="common">
+<h2>Common<a class="headerlink" href="#common" title="Link to this heading">¶</a></h2>
+<p>The common module gathers configuration data.</p>
+<figure class="align-default">
+<img alt="https://www.plantuml.com/plantuml/svg/bL6nQaCn3Dpz5I9BfkGJIg3G35tRkJYnNfx1bemi1qBflrT-IS4aMUh9Efzqf_EkgXTjEJbtv5oOa1JibfcScs92AsYAfwrovop852J8ruWJAyA1rGhWwGa1xBnZKU2cDGQ4VLGGB5oZibos2-6pDf_I1NH6Q1LbNM7cZ12YuF5AGmhGnPn9sfIPgyBtqjmfdavcRuLqZiAK-ofdBz4V4jOL-0hsOe3xkJTym__bibXklVSrSGlmnfAzHYRum5oILnpDNWE5pURbJsf0nfm6-354jxE9zbM_" src="https://www.plantuml.com/plantuml/svg/bL6nQaCn3Dpz5I9BfkGJIg3G35tRkJYnNfx1bemi1qBflrT-IS4aMUh9Efzqf_EkgXTjEJbtv5oOa1JibfcScs92AsYAfwrovop852J8ruWJAyA1rGhWwGa1xBnZKU2cDGQ4VLGGB5oZibos2-6pDf_I1NH6Q1LbNM7cZ12YuF5AGmhGnPn9sfIPgyBtqjmfdavcRuLqZiAK-ofdBz4V4jOL-0hsOe3xkJTym__bibXklVSrSGlmnfAzHYRum5oILnpDNWE5pURbJsf0nfm6-354jxE9zbM_" />
+</figure>
+<p>Generally, a lambda deployment relies on environment variables that are part of the lambda configuration.</p>
+<p>When running locally, the configuration file is split to keep private information
+in a separate file that’s not easily put into a Git repository.</p>
+</section>
+<section id="jinja-templates">
+<h2>Jinja Templates<a class="headerlink" href="#jinja-templates" title="Link to this heading">¶</a></h2>
+<p>Jinja templates are fairly complex pieces of functionality used in two places.</p>
+<p>HTML pages have a fair amount of boilerplate. Jinja faciltates this by permitting
+a sophisticated inheritance hierarchy among pages.</p>
+<figure class="align-default">
+<img alt="https://www.plantuml.com/plantuml/svg/RP7FJiCm3CRlUGfh9q1q3u2cQaDKxB2TkljaKiEyvK-L60GQl3jfDR6a8WSVFdznVlcyZ891tgrHgaTzmZU28xiZmbb1EjfWZD2u3mxUMNAIgK-iPUEnep2AcGdkgYfl_ro7Eo_yoXg5lGECCCk5UVyrAnvUxxQR_UEgRM2ns97j3GhLDLmympaGTW_mOhm-_Md2OcWgQkyaeKtbG2uHtd2gdtk7bkw1XMoy7Hq9V0ApRTfszJpXEL_CGysGlrCA-QKXXsigOqX5-x_UC4cf8hMggekDg0DtL09f3jgGKilqkxJRNm==" src="https://www.plantuml.com/plantuml/svg/RP7FJiCm3CRlUGfh9q1q3u2cQaDKxB2TkljaKiEyvK-L60GQl3jfDR6a8WSVFdznVlcyZ891tgrHgaTzmZU28xiZmbb1EjfWZD2u3mxUMNAIgK-iPUEnep2AcGdkgYfl_ro7Eo_yoXg5lGECCCk5UVyrAnvUxxQR_UEgRM2ns97j3GhLDLmympaGTW_mOhm-_Md2OcWgQkyaeKtbG2uHtd2gdtk7bkw1XMoy7Hq9V0ApRTfszJpXEL_CGysGlrCA-QKXXsigOqX5-x_UC4cf8hMggekDg0DtL09f3jgGKilqkxJRNm==" />
+</figure>
+<p>The diagram for the relationships in <a class="reference internal" href="code.html#module-writer" title="writer"><code class="xref py py-mod docutils literal notranslate"><span class="pre">writer</span></code></a> is similar to
+the one shown above for <a class="reference internal" href="code.html#module-notification" title="notification"><code class="xref py py-mod docutils literal notranslate"><span class="pre">notification</span></code></a>.
+It involves more than a single <code class="docutils literal notranslate"><span class="pre">HTML_MESSAGE</span></code> extension to <code class="docutils literal notranslate"><span class="pre">HTML_BASE</span></code>.</p>
+<figure class="align-default">
+<img alt="https://www.plantuml.com/plantuml/svg/bPBB2i8m44Nt-Oh1bOhw0LB4L_61Yc05TnBJmOQcQKaYAkg_6wkegRfm5Y5SpjovJDBMXYgpImGX6MKntIBi5JUeW6eetQ-Dx5Y24m5RJ52jOHXC9-jkP-63vmMOP88QRBNWmTmgGXesOIDI5Zyrmut0eiXIQL2QegnGXgZAt9w7jQG9ri0cINGb9owa66Oqw_ih9qrEl0Kzr-jlw8V1OjaT-xtW7oEdvQVXl3Fm__ExTP0NTKzK_JxrIRdvF-ZSqwujuY6wZyQuOW89QTkDsszm1G==" src="https://www.plantuml.com/plantuml/svg/bPBB2i8m44Nt-Oh1bOhw0LB4L_61Yc05TnBJmOQcQKaYAkg_6wkegRfm5Y5SpjovJDBMXYgpImGX6MKntIBi5JUeW6eetQ-Dx5Y24m5RJ52jOHXC9-jkP-63vmMOP88QRBNWmTmgGXesOIDI5Zyrmut0eiXIQL2QegnGXgZAt9w7jQG9ri0cINGb9owa66Oqw_ih9qrEl0Kzr-jlw8V1OjaT-xtW7oEdvQVXl3Fm__ExTP0NTKzK_JxrIRdvF-ZSqwujuY6wZyQuOW89QTkDsszm1G==" />
+</figure>
+<p>The overall <code class="docutils literal notranslate"><span class="pre">index.html</span></code> page is generated by the <code class="docutils literal notranslate"><span class="pre">HTML_INDEX</span></code> template.
+This template includes links to the other subject index pages.
+Each of the subject areas – court, docket, date, filtered – has a
+directory with an index page and a number of subject pages.
+The <code class="docutils literal notranslate"><span class="pre">court/index.html</span></code> has the list of index pages, created by the <code class="docutils literal notranslate"><span class="pre">HTML_SUBJECT_INDEX</span></code> template.
+Each of the <code class="docutils literal notranslate"><span class="pre">court/index_xx.html</span></code> pages is created by the <code class="docutils literal notranslate"><span class="pre">HTML_SUBJECT_PAGE</span></code> template,
+and contains one page of items.</p>
+<p>Template expansion works by “evaluating” a page template.
+Each page template extends the base template, which provides a consistent set of content.
+The base template includes blocks that are replaced by content
+defined in the extension templates.</p>
+<p>The template language includes <code class="docutils literal notranslate"><span class="pre">for</span></code> commands, allowing
+template and content to be repeated for each item in a collection.
+Additionally, “macro” definitions allow for pieces of template content
+to be injected consistently in multiple places within a page.</p>
 </section>
 </section>
 
@@ -133,10 +213,14 @@ A notification strategy is provided in the <code class="xref py py-mod docutils 
 <li class="toctree-l1"><a class="reference internal" href="containers.html">Containers</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Components</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#monitor">Monitor</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#handler">Handler</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#reader">Reader</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#filter">Filter</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#writer">Writer</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#notification">Notification</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#model">Model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#common">Common</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#jinja-templates">Jinja Templates</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="code.html">Code</a></li>
@@ -163,7 +247,7 @@ A notification strategy is provided in the <code class="xref py py-mod docutils 
     </form>
     </div>
 </div>
-<script>$('#searchbox').show(0);</script>
+<script>document.getElementById('searchbox').style.display = "block"</script>
 
 
 
@@ -180,7 +264,7 @@ A notification strategy is provided in the <code class="xref py py-mod docutils 
       &copy;2023, S.Lott.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 4.4.0</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 7.2.6</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.13</a>
       
       |

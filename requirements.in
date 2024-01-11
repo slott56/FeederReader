@@ -1,5 +1,10 @@
 pydantic
-invoke
 requests
 jinja2
 schedule
+# Python 3.12 Lambda run-time
+# See https://docs.aws.amazon.com/lambda/latest/dg/lambda-runtimes.html
+# Also https://docs.aws.amazon.com/lambda/latest/dg/lambda-python.html
+boto3  # >=1.28.83
+botocore  # >=1.31.83
+

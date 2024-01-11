@@ -5,14 +5,20 @@ Requires --log-format="%(levelname)s:%(name)s:%(message)s"
 
 """
 from collections import Counter
+import datetime
 import logging
 from pathlib import Path
-from unittest.mock import Mock, call
+from unittest.mock import Mock, MagicMock, call
+
+from pydantic.networks import Url
 
 import pytest
 
 import filter
+import model
 import common
+import storage
+import notification
 
 
 @pytest.fixture()
@@ -51,9 +57,27 @@ def mock_history():
     return history
 
 
+@pytest.fixture
+def mock_item():
+    item = model.USCourtItem(
+        title="2:23-cv-08293-NJC-ST Miller v. Sanofi US Services Inc. et al",
+        link=Url("https://ecf.nyed.uscourts.gov/cgi-bin/DktRpt.pl?505703"),
+        description="[Order to Show Cause] Miller v. Sanofi US Services Inc. et al",
+        text_pub_date="Fri, 29 Dec 2023 21:23:33 GMT",
+        docket="2:23-cv-08293-NJC-ST",
+        parties="Miller v. Sanofi US Services Inc. et al",
+    )
+    return item
+
+
+@pytest.fixture
+def mock_item_detail(mock_channel, mock_item):
+    return model.USCourtItemDetail(item=mock_item, channel=mock_channel)
+
+
 @pytest.fixture()
-def mock_storage(mock_history):
-    items = [Mock(item=Mock(docket="another example", pub_date=2))]
+def mock_storage(mock_history, mock_item_detail):
+    items = [mock_item_detail]
     return Mock(
         exists=Mock(return_value=True),
         listdir=Mock(return_value=[("date", "hr", "items.json")]),
@@ -72,8 +96,18 @@ def mock_config(tmp_path, monkeypatch):
 
 
 def test_filter(caplog, monkeypatch, mock_config, mock_storage, mock_history):
+    mock_notification = MagicMock()
+    mock_notification_class = Mock(return_value=mock_notification)
+
+    def mock_get_class(cls):
+        match cls:
+            case storage.Storage:
+                return Mock(return_value=mock_storage)
+            case notification.Notification:
+                return mock_notification_class
+
     caplog.set_level(logging.INFO)
-    monkeypatch.setattr(filter, "LocalFileStorage", Mock(return_value=mock_storage))
+    monkeypatch.setattr(common, "get_class", Mock(side_effect=mock_get_class))
     mock_new = Mock(item=Mock(docket="example", pub_date=3))
     mock_match_items = Mock(return_value=[mock_new])
     monkeypatch.setattr(filter, "match_items", mock_match_items)
@@ -85,10 +119,16 @@ def test_filter(caplog, monkeypatch, mock_config, mock_storage, mock_history):
         "INFO:filter:History start     1",
         "INFO:filter:Scanning downloaded items",
         "INFO:filter:Saving filter.json",
-        "INFO:LogNote:Writing 1 items to ('notification', '2024-Jan-07.md')",
+        # "INFO:LogNote:Writing 1 items to ('notification', '2024-Jan-07.md')",
         "INFO:filter:History end       2",
         "INFO:filter:Counter({'history:end': 2, 'targets': 1, 'history:start': 1})",
     ]
     assert mock_storage.write_json.mock_calls == [
         call("filter.json", mock_history + [mock_new])
+    ]
+    assert mock_notification_class.mock_calls == [call(mock_storage, {"smtp": {}, 'ses': {'admin': 'admin@domain.smtp.your_host', 'send_to': 'slott56@gmail.com'}})]
+    assert mock_notification.mock_calls == [
+        call.__enter__(),
+        call.__enter__().notify(mock_new),
+        call.__exit__(None, None, None),
     ]

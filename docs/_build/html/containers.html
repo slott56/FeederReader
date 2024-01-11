@@ -1,18 +1,16 @@
-
 <!DOCTYPE html>
 
-<html>
+<html lang="en" data-content_root="./">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <title>Containers &#8212; RSS FDRDR 2024.1 documentation</title>
-    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="_static/alabaster.css" />
-    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
-    <script src="_static/jquery.js"></script>
-    <script src="_static/underscore.js"></script>
-    <script src="_static/doctools.js"></script>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=4f649999" />
+    <link rel="stylesheet" type="text/css" href="_static/alabaster.css?v=039e1c02" />
+    <script src="_static/documentation_options.js?v=db884f6e"></script>
+    <script src="_static/doctools.js?v=888ff710"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Components" href="components.html" />
@@ -34,37 +32,40 @@
           <div class="body" role="main">
             
   <section id="containers">
-<h1>Containers<a class="headerlink" href="#containers" title="Permalink to this headline">¶</a></h1>
+<h1>Containers<a class="headerlink" href="#containers" title="Link to this heading">¶</a></h1>
 <p>There are two implementation options.</p>
 <ol class="arabic simple">
 <li><p>On a local host, i.e., a PC.</p></li>
 <li><p>On a cloud computer as a serverless lambda.</p></li>
 </ol>
 <section id="local-host">
-<h2>Local Host<a class="headerlink" href="#local-host" title="Permalink to this headline">¶</a></h2>
+<h2>Local Host<a class="headerlink" href="#local-host" title="Link to this heading">¶</a></h2>
 <p>On a local host, i.e, a PC, the configuration looks like this:</p>
 <figure class="align-default">
-<img alt="https://www.plantuml.com/plantuml/svg/PL3B3e8m4BptApQUzC0V68BnviL4uWSii0X9wPAsX13ZlxiML1uzDCtCxCni4-VH-gxHIXak23JdgE6fG4xEJSk6Z8Tsy1MR5LWI5MGjeTo16bKGHV6MAz1ZXewWgfrdEmImP2qyx7hAeCK7kHsWWyfBcsLKPhbtulGQIvwkz_GybInhJN1BK-7s1w06Qrbb7W_7A0g2DHZ_kYoO3p7QRE3GJ64kGt3XpXhKug3K_nt2nkcfSq32u4mbq7SbbP0fvF_V" src="https://www.plantuml.com/plantuml/svg/PL3B3e8m4BptApQUzC0V68BnviL4uWSii0X9wPAsX13ZlxiML1uzDCtCxCni4-VH-gxHIXak23JdgE6fG4xEJSk6Z8Tsy1MR5LWI5MGjeTo16bKGHV6MAz1ZXewWgfrdEmImP2qyx7hAeCK7kHsWWyfBcsLKPhbtulGQIvwkz_GybInhJN1BK-7s1w06Qrbb7W_7A0g2DHZ_kYoO3p7QRE3GJ64kGt3XpXhKug3K_nt2nkcfSq32u4mbq7SbbP0fvF_V" />
+<img alt="https://www.plantuml.com/plantuml/svg/PL5B2eCm4Dtd54DNxS8Rb6Bfhfj2fGSOpLY5c94a8b9wzuu_r9f52EytRqZi0xhGL4Ofovh0S8O6FWhaP5pLRCa6gBjGiFq3So9DpX7AFL2Z2gBeikSq1apH4nIb3-ow0SpP20-7bbAeyKt-0EYX2D9cEofrt7f9-eubhuzNSfjAvgKXU2Q9SCSJK8MbhB8UF_Jf1HlmtADpbvryZDd1GpE5cPZWpespQ2H1gUNTvqxkgVDYNAbwRDv9nMIrVC0F" src="https://www.plantuml.com/plantuml/svg/PL5B2eCm4Dtd54DNxS8Rb6Bfhfj2fGSOpLY5c94a8b9wzuu_r9f52EytRqZi0xhGL4Ofovh0S8O6FWhaP5pLRCa6gBjGiFq3So9DpX7AFL2Z2gBeikSq1apH4nIb3-ow0SpP20-7bbAeyKt-0EYX2D9cEofrt7f9-eubhuzNSfjAvgKXU2Q9SCSJK8MbhB8UF_Jf1HlmtADpbvryZDd1GpE5cPZWpespQ2H1gUNTvqxkgVDYNAbwRDv9nMIrVC0F" />
 </figure>
 <p>This requires either manually running the application periodically,
-or configuring a scheduler to run the app periodically.</p>
-<p>If the computer is on and connected, this
-can work out nicely.</p>
-<p>The <a class="reference external" href="https://schedule.readthedocs.io/en/stable/index.html">https://schedule.readthedocs.io/en/stable/index.html</a>
-package provides a high-level scheduler
-that can be started and left running.</p>
+or leaving it running in a terminal window.</p>
 </section>
 <section id="cloud">
-<h2>Cloud<a class="headerlink" href="#cloud" title="Permalink to this headline">¶</a></h2>
+<h2>Cloud<a class="headerlink" href="#cloud" title="Link to this heading">¶</a></h2>
 <p>When using a cloud implementation, the configuration looks like this:</p>
 <figure class="align-default">
-<img alt="https://www.plantuml.com/plantuml/svg/PL6x3i8W5DtvYXid7PXSZQbnSr0ZyGDkowrjmgC1ciOO_rsanIS38UV5WLluW2xqMZ5ch2GuRk768AxAwiuQCW5APmTFZjqdYK9TIloJTTVGMFC3raIId2ECUw965N2-_kPok5XEmH83bkW9cjO7wwu9hAsAOfWDL4A75_8pG0zDYFLpmEPm5laDTQi8JaAyq_TYekOB88rjydqMWHNdoV8Bhbz5lfWdCGRzmQaMmogQO6TxPr351CRUvtJPw9u-EI79-A6AK9u1AyZ8EAq7" src="https://www.plantuml.com/plantuml/svg/PL6x3i8W5DtvYXid7PXSZQbnSr0ZyGDkowrjmgC1ciOO_rsanIS38UV5WLluW2xqMZ5ch2GuRk768AxAwiuQCW5APmTFZjqdYK9TIloJTTVGMFC3raIId2ECUw965N2-_kPok5XEmH83bkW9cjO7wwu9hAsAOfWDL4A75_8pG0zDYFLpmEPm5laDTQi8JaAyq_TYekOB88rjydqMWHNdoV8Bhbz5lfWdCGRzmQaMmogQO6TxPr351CRUvtJPw9u-EI79-A6AK9u1AyZ8EAq7" />
+<img alt="https://www.plantuml.com/plantuml/svg/PP9DJyCm38Rl-HLcuW27QOTTgshJn0M1G4I8izjwNQLyL4cg2X3_7JSqRLTwIABuyUitTWy-e0kTLkAcCQNgAe8CUxyhhTRMvAjR6Qp3cdP7ZL_MoFrqM8CdgzikCFWXdr0N5SwdDVfCtcFTc3g9FSZvb0k19HU5HzivWwhnGGXZEVVr1Dy2-6EdhJLa0XJEzfwS-1cHuykxJDIvKGHlKWx1Kjck0ZOqnYAieZd8ijlPQJu2rsNEH1KvHyXh3BFai5KOi41F8FSGTL9lbZ8JTE6dMFSv1SvMiHviUYgWvHxx3Q27I-39Z3NYxgWCQ6f-37TdKOLRjInpTm-aiKcvdBrq3Tjj7fjnTPaDjydM2kV8dzu_cUXGpECPP4PsdCUCBIY6qhZ4WKp5V-0l" src="https://www.plantuml.com/plantuml/svg/PP9DJyCm38Rl-HLcuW27QOTTgshJn0M1G4I8izjwNQLyL4cg2X3_7JSqRLTwIABuyUitTWy-e0kTLkAcCQNgAe8CUxyhhTRMvAjR6Qp3cdP7ZL_MoFrqM8CdgzikCFWXdr0N5SwdDVfCtcFTc3g9FSZvb0k19HU5HzivWwhnGGXZEVVr1Dy2-6EdhJLa0XJEzfwS-1cHuykxJDIvKGHlKWx1Kjck0ZOqnYAieZd8ijlPQJu2rsNEH1KvHyXh3BFai5KOi41F8FSGTL9lbZ8JTE6dMFSv1SvMiHviUYgWvHxx3Q27I-39Z3NYxgWCQ6f-37TdKOLRjInpTm-aiKcvdBrq3Tjj7fjnTPaDjydM2kV8dzu_cUXGpECPP4PsdCUCBIY6qhZ4WKp5V-0l" />
 </figure>
-<p>This requires a Cloud Formation Template to build
-the Lambda and SNS, and bind the SNS to an email output.</p>
+<p>This runs independently.</p>
+<p>AWS cloud infrastructure requires a Cloud Formation Template to build the resources:</p>
+<ul class="simple">
+<li><p>The S3 bucket.</p></li>
+<li><p>The Lambda.</p></li>
+</ul>
+<p>Also, the email domain information must be verified with Amazon to permit sending email.
+This means setting up an “<a class="reference external" href="mailto:me&#46;admin&#37;&#52;&#48;gmail&#46;com">me<span>&#46;</span>admin<span>&#64;</span>gmail<span>&#46;</span>com</a>” address in addition to “<a class="reference external" href="mailto:me&#37;&#52;&#48;gmail&#46;com">me<span>&#64;</span>gmail<span>&#46;</span>com</a>”.
+A verification email must be sent and confirmed by AWS.</p>
+<p>Further, the lambda must be configured with the ARN (Amazon Resource Name) for the S3 bucket.</p>
 </section>
 <section id="summary">
-<h2>Summary<a class="headerlink" href="#summary" title="Permalink to this headline">¶</a></h2>
+<h2>Summary<a class="headerlink" href="#summary" title="Link to this heading">¶</a></h2>
 <p>Note that the components are the same.
 The host processing each component is distinct.</p>
 </section>
@@ -121,7 +122,7 @@ The host processing each component is distinct.</p>
     </form>
     </div>
 </div>
-<script>$('#searchbox').show(0);</script>
+<script>document.getElementById('searchbox').style.display = "block"</script>
 
 
 
@@ -138,7 +139,7 @@ The host processing each component is distinct.</p>
       &copy;2023, S.Lott.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 4.4.0</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 7.2.6</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.13</a>
       
       |

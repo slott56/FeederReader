@@ -30,7 +30,7 @@ On a local host, i.e, a PC, the configuration looks like this:
     }
     () email
 
-    feederreader <-- RSS
+    feederreader --> RSS
     feederreader <--> history
     feederreader --> email
     feederreader --> html
@@ -38,21 +38,13 @@ On a local host, i.e, a PC, the configuration looks like this:
     actor Journalist
 
     Journalist <-- email
-    browser <-- html
-    Journalist -- browser
+    browser --> html
+    Journalist --> browser
 
     @enduml
 
 This requires either manually running the application periodically,
-or configuring a scheduler to run the app periodically.
-
-If the computer is on and connected, this
-can work out nicely.
-
-The https://schedule.readthedocs.io/en/stable/index.html
-package provides a high-level scheduler
-that can be started and left running.
-
+or leaving it running in a terminal window.
 
 Cloud
 =====
@@ -63,45 +55,62 @@ When using a cloud implementation, the configuration looks like this:
 ..  plantuml::
 
     @startuml
+    !include <aws/common>
+    !include <aws/Storage/AmazonS3/AmazonS3>
+    !include <aws/Compute/AWSLambda/AWSLambda>
+    !include <aws/Messaging/AmazonSES/AmazonSES>
+
+    actor Journalist
 
     node PC {
         component browser
-    }
-
-    node lambda {
-        component python
-        component feederreader
-        python --> feederreader
-    }
-
-    node S3 {
-        database history
-        folder "web pages" as html
     }
 
     node AOUSC {
         file RSS
     }
 
-    node SNS {
-        () email
+    cloud AWS {
+        node lambda <<$AWSLambda>> {
+            component feederreader
+        }
+
+        database S3  <<$AmazonS3>> {
+            database history
+            folder "web pages" as html
+        }
+
+
+        rectangle SES <<$AmazonSES>> {
+            () email
+        }
     }
 
-    feederreader <-- RSS
+    feederreader --> RSS
     feederreader <--> history
-    feederreader --> email
+    feederreader ---> email
     feederreader --> html
 
-    actor Journalist
-
     Journalist <-- email
-    browser <-- html
+    browser --> html
     Journalist -- browser
 
     @enduml
 
-This requires a Cloud Formation Template to build
-the Lambda and SNS, and bind the SNS to an email output.
+This runs independently.
+
+AWS cloud infrastructure requires a Cloud Formation Template to build the resources:
+
+-   The S3 bucket.
+
+-   The Lambda.
+
+Also, the email domain information must be verified with Amazon to permit sending email.
+This means setting up an "me.admin@gmail.com" address in addition to "me@gmail.com".
+A verification email must be sent and confirmed by AWS.
+
+Further, the lambda must be configured with the ARN (Amazon Resource Name) for the S3 bucket.
+
 
 Summary
 =======

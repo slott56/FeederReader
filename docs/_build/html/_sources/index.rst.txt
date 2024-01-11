@@ -22,6 +22,11 @@ of interest.
    test
    operate
 
+To Do
+=====
+
+.. todolist::
+
 Indices and tables
 ==================
 

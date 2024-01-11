@@ -1,11 +1,38 @@
-"""Writer portion of Feeder Reader.
+"""Writer application of the Feeder Reader.
 
-From the ``config.toml``, get a desired output format.
+..  plantuml::
+
+    @startuml
+    class load_indices << (F, orchid) Function >>
+    class write_csv << (F, orchid) Function >>
+    class paginate_keys << (F, orchid) Function >>
+    class write_template << (F, orchid) Function >>
+    class writer << (F, orchid) Function >>
+
+    component storage {
+        class Storage
+    }
+    component common {
+        class get_config << (F, orchid) Function >>
+    }
+    component jinja {
+        class Environment
+        class Template
+    }
+
+    load_indices --> Storage : "reads"
+
+
+    @enduml
+
+
+
+The :py:func:`writer` uses :py:mod:`common` to get the target output format.
 
 This reads *all* the unique items from the data cache, organizes them, and then
 emits all of them using the selected template.
 
-It also looks for a `filter.json` with the dockets considered interesting by the filter.
+It also looks for a ``filter.json`` with the dockets considered interesting by the filter.
 """
 from collections import defaultdict
 import csv
@@ -18,7 +45,7 @@ from jinja2 import Environment, DictLoader
 
 import common
 from model import USCourtItemDetail
-from storage import Storage, LocalFileStorage
+from storage import Storage
 
 MD_COURT_INDEX = """\
 # Court
@@ -152,6 +179,56 @@ DetailMap: TypeAlias = dict[str, list[USCourtItemDetail]]
 
 
 def load_indices(storage: Storage) -> dict[str, DetailMap]:
+    """
+    Reads all of the data files to organize items by court, docket, date, as well
+    those found by the :py:mod:`filter` application.
+
+Here's the transformation done by the :py:func:`load_indices` function.
+
+    ..  plantuml::
+
+        @startuml
+
+        object YYYYMMDD
+        object HH
+        object "items.json" as data
+
+        YYYYMMDD *-- HH
+        HH *-- data
+        data *-- USCourtItemDetail
+
+        class USCourtItemDetail {
+            court
+            docket
+            pub_date
+        }
+
+        object court
+        court o-- USCourtItemDetail : list
+
+        object docket
+        docket o-- USCourtItemDetail : list
+
+        object date
+        date o-- USCourtItemDetail : list
+
+        object filtered
+        filtered o-- USCourtItemDetail : list
+
+        map "**indices**" as indices {
+        court *--> court
+        docket *---> docket
+        date *----> date
+        filtered *-----> filtered
+        }
+
+        data =[thickness=4]=> indices : "transformed by load_indices()"
+
+        @enduml
+
+    :param storage: Storage for all items.
+    :return: a dictionary with a collection of mappings used to organize the presentation.
+    """
     court: defaultdict[str, list[USCourtItemDetail]] = defaultdict(list)
     docket: defaultdict[str, list[USCourtItemDetail]] = defaultdict(list)
     date: defaultdict[str, list[USCourtItemDetail]] = defaultdict(list)
@@ -180,6 +257,12 @@ def load_indices(storage: Storage) -> dict[str, DetailMap]:
 
 
 def write_csv(indices: dict[str, DetailMap]) -> None:
+    """
+    Writes a CSV-formatted extract of the "court" index.
+    This is written to standard output.
+
+    :param indices: Indices mapping created by :py:func:`load_indices`
+    """
     court = indices["court"]
     rows = (
         [
@@ -199,6 +282,15 @@ def write_csv(indices: dict[str, DetailMap]) -> None:
 
 
 def paginate_keys(keys: list[Any], page_size: int) -> list[tuple[int, tuple[int, int]]]:
+    """
+    Decomposes the keys in an index into pages. Returns list of page number and start-end values.
+    This can be used to group keys into pages.
+
+    :param keys: Keys to an index created by  :py:func:`load_indices`
+    :param page_size: Page size.  A value of zero stops pagination and returns a [(1, (0, len))] list
+        of page numbers and start values.
+    :return: List of tuple[page number, tuple[start, end]] values.
+    """
     if page_size != 0:
         start_stop = [
             (start, start + page_size) for start in range(0, len(keys), page_size)
@@ -215,6 +307,17 @@ def write_template(
     page_size: int,
     indices: dict[str, DetailMap],
 ) -> None:
+    """
+    Writes the ``index.html``, and ``index_page.html`` files for the expected four keys
+    in the output from the :py:func:`load_indices` function.
+
+    :param logger: A place to log interesting info.
+    :param output: The Storage to which the files will be written.
+    :param format: The format, "html" or "md"
+    :param page_size: The page size
+    :param indices: The output from the :py:func:`load_indices` function
+    :return:
+    """
     env = Environment(
         loader=DictLoader(
             {
@@ -278,6 +381,13 @@ def write_template(
 
 
 def writer() -> None:
+    """
+    Captures the RSS state as HTML or MD files.
+    Uses :py:func:`common.get_config` to get the format, page size, and the Storage class.
+    Uses :py:func:`load_indices` to gather the items.
+    Uses :py:func:`write_template` to write HTML or MD output.
+    Uses :py:func:`write_csv` to write CSV output.
+    """
     logger = logging.getLogger("writer")
 
     config = common.get_config()
@@ -286,7 +396,8 @@ def writer() -> None:
 
     logger.info("Reading captured items")
     rdr_base = Path.cwd() / rdr_config["base_directory"]
-    storage = LocalFileStorage(rdr_base)
+    storage_cls = common.get_class(Storage)
+    storage = storage_cls(rdr_base)
     indices = load_indices(storage)
     for k in indices:
         logger.info("%-10s  %5d", k, len(indices[k]))
@@ -297,7 +408,7 @@ def writer() -> None:
 
     elif wtr_config["format"] in {"html", "md"}:
         wtr_base = Path.cwd() / wtr_config["base_directory"]
-        output = LocalFileStorage(wtr_base)
+        output = storage_cls(wtr_base)
 
         format = wtr_config["format"]
         page_size = wtr_config["page_size"]

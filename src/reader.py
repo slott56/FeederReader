@@ -1,11 +1,69 @@
-"""Reader portion of the Feeder Reader.
+"""Reader application of the Feeder Reader.
 
-From the ``config.toml``, get a list of feeds.
+..  plantuml::
 
-Get the current RSS document, and parse to extract Channel and Item details.
+    @startuml
+    class feed_iter << (F, orchid) Function >>
+    class capture << (F, orchid) Function >>
+    class reader << (F, orchid) Function >>
+    class cleaner << (F, orchid) Function >>
 
-Note that feeds are updated to have only the previous 24 hours of content.
-This should be run at least once each day, twice to be sure nothing is missed.
+    component storage {
+        class Storage
+    }
+
+    reader --> feed_iter : "for each RSS feed"
+    reader --> capture
+
+    class XML
+
+    component model {
+        class USCourtItemDetail
+        class USCourtItem
+        class Channel
+
+        Channel *-- "1,m" USCourtItem
+        USCourtItem <-- USCourtItemDetail /' --> USCourtItem '/
+        Channel <-- USCourtItemDetail     /' --> Channel '/
+    }
+
+    XML *-- Channel
+    XML *-- USCourtItem
+    feed_iter --> XML : "reads"
+    feed_iter o--> Channel : "yields"
+    feed_iter o--> USCourtItem : "yields"
+
+    capture --> feed_iter : "consumes"
+    capture o--> USCourtItemDetail : "creates"
+    capture --> Storage : "reads and writes"
+    Storage *--> USCourtItemDetail : "contains"
+
+    cleaner --> Storage
+
+    component common {
+        class get_config << (F, orchid) Function >>
+    }
+
+    reader --> get_config
+    cleaner --> get_config
+
+    hide empty members
+
+    @enduml
+
+The :py:func:`reader` uses :py:mod:`common` to get parameters with the list of RSS feeds.
+For each feed, it gets the current RSS document, and parses this to extract
+the :py:class:`USCourtItemDetail` details.
+
+.. important::
+
+    Feeds have only the previous 24 hours of content.
+
+    This should be run at least once each day, twice to be sure nothing is missed.
+
+..  todo:: This needs to be more cautious about reading from storage.
+
+    We can't reread stored history for every individual item.
 """
 from collections import Counter
 import datetime
@@ -18,12 +76,19 @@ import requests
 
 import common
 from model import Channel, USCourtItem, USCourtItemDetail, Feed
-from storage import Storage, LocalFileStorage
+from storage import Storage
 
 
 def feed_iter(document: ElementTree.Element) -> Feed:
-    """Iterate through the <channel><item>...</item></channel> structure of an <rss>.
-    This emits a sequence of Channel and USCourtItem objects from the XML.
+    """
+    Iterates through the ``<channel><item>...</item></channel>`` structure of the ``<rss>`` tag describing a feed.
+
+    This emits a sequence of :py:class:`model.Channel` and :py:class:`model.USCourtItem` objects from the XML.
+    No effort is made to combine the :py:class:`Channel` and :py:class:`USCourtItem` items;
+    the data is emitted as a denormalized sequence.
+
+    :param document: the XML source.
+    :returns: an iterable of :py:class:`Channel` and :py:class:`USCourtItem`
     """
     for channel in document.iter("channel"):
         yield Channel.from_tag(channel)
@@ -31,10 +96,16 @@ def feed_iter(document: ElementTree.Element) -> Feed:
             yield USCourtItem.from_tag(item)
 
 
-def capture(writer: Storage, feed: Feed) -> None:
+def capture(storage: Storage, feed: Feed) -> None:
     """
-    Save this feed JSON files ``{item.date}/{item.time.hour}/items.json``.
+    Save this feed into JSON file in storage ``{item.date}/{item.time.hour}/items.json``.
 
+    This transforms the publication date into ``YYYYMMDD/HH`` path to a file.
+    If the file exists, this is added to the content.
+
+    If the file doesn't exist, it's created.
+
+    :param storage: Where to stash history.
     """
     logger = logging.getLogger("reader.capture")
     counts: Counter[str] = Counter()
@@ -50,15 +121,16 @@ def capture(writer: Storage, feed: Feed) -> None:
                     f"{detail.item.pub_date.hour:02d}",
                 )
                 logger.debug(detail.model_dump_json())
-                if not writer.exists(path):
+                if not storage.exists(path):
                     logger.info("Make %s", path)
-                    writer.make(path)
+                    storage.make(path)
                 item_name = path + ("items.json",)
+                # TODO: This should be part of local cache, NOT reloaded each time.
                 existing_items: list[USCourtItemDetail]
-                if writer.exists(item_name):
+                if storage.exists(item_name):
                     existing_items = cast(
                         list[USCourtItemDetail],
-                        writer.read_json(item_name, USCourtItemDetail),
+                        storage.read_json(item_name, USCourtItemDetail),
                     )
                 else:
                     existing_items = []
@@ -69,7 +141,7 @@ def capture(writer: Storage, feed: Feed) -> None:
                     new_items = sorted(
                         existing_item_set | {detail}, key=lambda d: d.item.pub_date
                     )
-                    writer.write_json(item_name, new_items)
+                    storage.write_json(item_name, new_items)
                     counts["new"] += 1
                 else:
                     counts["duplicate"] += 1
@@ -80,13 +152,20 @@ def capture(writer: Storage, feed: Feed) -> None:
 
 
 def reader() -> None:
+    """
+    Reads all RSS feeds and saves the items.
+    Uses :py:func:`common.get_config` to get the list of feeds and the storage class.
+    Uses :py:func:`feed_iter` to parse XML.
+    Uses :py:func:`capture` to preserve the :py:class:`model.USCourtItemDetail` items.
+    """
     logger = logging.getLogger("reader")
 
     config = common.get_config()
     rdr_config = config["reader"]
 
     base = Path.cwd() / rdr_config["base_directory"]
-    writer = LocalFileStorage(base)
+    storage_cls = common.get_class(Storage)
+    writer = storage_cls(base)
 
     for url in rdr_config["feeds"]:
         logger.info("Downloading %s", url)
@@ -99,6 +178,11 @@ def reader() -> None:
 
 
 def cleaner() -> None:
+    """
+    Removes all old files. The configuration file provides the window size.
+
+    Uses :py:func:`common.get_config` to get the list of feeds and the storage class.
+    """
     logger = logging.getLogger("cleaner")
 
     config = common.get_config()
@@ -109,7 +193,8 @@ def cleaner() -> None:
     before = today - datetime.timedelta(days=cln_config["days_ago"])
 
     base = Path.cwd() / rdr_config["base_directory"]
-    writer = LocalFileStorage(base)
+    storage_cls = common.get_class(Storage)
+    writer = storage_cls(base)
 
     logger.info("Removing files from prior to %s", before)
 

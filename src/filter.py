@@ -1,14 +1,40 @@
-"""Filter portion of Feeder Reader.
+"""Filter application of the Feeder Reader.
 
-From the ``config.toml``, get a list of interesting docket numbers.
+..  plantuml::
 
-This keeps an cache of items that are interesting.
+    @startuml
+    class match_items << (F, orchid) Function >>
+    class filter << (F, orchid) Function >>
 
-It scanes the entire downloaded collection of items looking
-for "interesting" items. It compares those with the cache to see if
+    component storage {
+        class Storage
+    }
+    component notification {
+        class Notification
+    }
+    component common {
+        class get_config << (F, orchid) Function >>
+    }
+
+    match_items --> Storage : "reads"
+
+    filter --> match_items : "consumes"
+    filter --> Notification : "notify"
+    filter --> Storage : "writes"
+    filter --> get_config
+
+    hide empty members
+
+    @enduml
+
+
+The :py:func:`filter` uses :py:mod:`common` to get the list of interesting docket numbers.
+
+It scans the entire downloaded collection of items looking
+for "interesting" docket.
+It compares those with the history cache to see if
 there have been changes.
-
-Changes trigger notification -- SMTP email or an SNS.
+When changes are found the cache is updated and notifications are sent.
 """
 from collections import Counter
 from collections.abc import Iterator
@@ -18,8 +44,8 @@ from typing import cast
 
 import common
 from model import USCourtItemDetail
-from storage import Storage, LocalFileStorage
-from notification import LogNote
+from storage import Storage
+from notification import Notification
 
 
 def match_items(
@@ -30,9 +56,12 @@ def match_items(
     counts: Counter[str],
 ) -> Iterator[USCourtItemDetail]:
     """
-    A sequence of filters...
+    Examine all the items in storage, looking for interesting dockets.
 
-    Sadly, we've pre-empted the name filter() in this module.
+    The implementation is a sequence of filters...
+
+    Sadly, we've pre-empted the name ``filter()`` in this module.
+    Here's the alternative design.
 
     ::
 
@@ -40,6 +69,12 @@ def match_items(
         has_docket = filter(lambda item: item.item.docket, source)
         has_target = filter(lambda item: any(d in item.item.docket.lower() for d in targets), has_docket)
         novel = filter(lambda item: item not in history, has_target)
+
+    :param storage: The persistent storage from which we can read data.
+    :param path: The path in storage to find :py:class:`model.USCourtItemDetail` instances.
+    :param targets: The various dockets that are interesting.
+    :param history: The previous state of the history, to see if this is new.
+    :param coutns: A counter to update when something new is found.
     """
     for item in cast(
         list[USCourtItemDetail], storage.read_json(path, USCourtItemDetail)
@@ -53,7 +88,15 @@ def match_items(
         else:
             counts["no docket"] += 1
 
+
 def filter() -> None:
+    """
+    Reads the RSS data.
+    Uses :py:func:`common.get_config` to get the list of dockers, and the storage class,
+    and the notifier class.
+    Uses :py:func:`match_items` to get items on the interesting dockets.
+    Uses the give notifier to notify of changes.
+    """
     logger = logging.getLogger("filter")
 
     config = common.get_config()
@@ -62,7 +105,8 @@ def filter() -> None:
     nfr_config = config["notifier"]
 
     rdr_base = Path.cwd() / rdr_config["base_directory"]
-    storage = LocalFileStorage(rdr_base)
+    storage_cls = common.get_class(Storage)
+    storage = storage_cls(rdr_base)
 
     targets = list(d.lower() for d in ftr_config["dockets"])
     logger.info("Dockets %s", targets)
@@ -80,13 +124,13 @@ def filter() -> None:
     logger.info("History start %5d", len(history))
     counts["history:start"] = start
 
-    with LogNote(storage, nfr_config) as notifier:
-
+    note_class = common.get_class(Notification)
+    with note_class(storage, nfr_config) as notifier:
         logger.info("Scanning downloaded items")
         for path in storage.listdir(("*", "*", "items.json")):
             for new_item in match_items(storage, path, targets, history, counts):
                 history.add(new_item)
-                notifier.notify(str(new_item))
+                notifier.notify(new_item)
 
         logger.info("Saving filter.json")
         history_items = sorted(history, key=lambda d: d.item.pub_date)

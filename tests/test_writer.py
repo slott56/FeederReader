@@ -14,13 +14,13 @@ from pydantic.networks import Url
 import pytest
 
 import common
-import reader
+import model
 import writer
 
 
 @pytest.fixture
 def mock_channel():
-    c = reader.Channel(
+    c = model.Channel(
         title="Eastern District of New York Filings Entries on cases",
         link=Url("https://ecf.nyed.uscourts.gov/"),
         description="Public Filings in the last 24 Hours",
@@ -31,7 +31,7 @@ def mock_channel():
 
 @pytest.fixture
 def mock_item():
-    item = reader.USCourtItem(
+    item = model.USCourtItem(
         title="2:23-cv-08293-NJC-ST Miller v. Sanofi US Services Inc. et al",
         link=Url("https://ecf.nyed.uscourts.gov/cgi-bin/DktRpt.pl?505703"),
         description="[Order to Show Cause] Miller v. Sanofi US Services Inc. et al",
@@ -44,7 +44,7 @@ def mock_item():
 
 @pytest.fixture
 def mock_item_detail(mock_channel, mock_item):
-    return reader.USCourtItemDetail(item=mock_item, channel=mock_channel)
+    return model.USCourtItemDetail(item=mock_item, channel=mock_channel)
 
 
 @pytest.fixture()
@@ -129,7 +129,7 @@ def test_write_html(caplog, mock_load_indices):
 @pytest.fixture()
 def mock_no_config(tmp_path, monkeypatch):
     monkeypatch.setattr(
-        reader, "Path", Mock(wraps=Path, cwd=Mock(return_value=tmp_path))
+        writer, "Path", Mock(wraps=Path, cwd=Mock(return_value=tmp_path))
     )
 
 
@@ -139,7 +139,7 @@ def test_html_writer(caplog, mock_no_config, monkeypatch, mock_load_indices):
     mock_writer_storage = Mock()
     mock_write_template = Mock()
     mock_storage_class = Mock(side_effect=[mock_reader_storage, mock_writer_storage])
-    monkeypatch.setattr(writer, "LocalFileStorage", mock_storage_class)
+    monkeypatch.setattr(common, "get_class", Mock(return_value=mock_storage_class))
     monkeypatch.setattr(writer, "load_indices", Mock(return_value=mock_load_indices))
     monkeypatch.setattr(writer, "write_template", mock_write_template)
     writer.writer()
@@ -173,7 +173,9 @@ def test_csv_writer(caplog, mock_config, monkeypatch, mock_load_indices):
     mock_writer_storage = Mock()
     mock_write_csv = Mock()
     mock_storage_class = Mock(side_effect=[mock_reader_storage, mock_writer_storage])
-    monkeypatch.setattr(writer, "LocalFileStorage", mock_storage_class)
+    monkeypatch.setattr(
+        common, "get_class", Mock(return_value=Mock(return_value=mock_storage_class))
+    )
     monkeypatch.setattr(writer, "load_indices", Mock(return_value=mock_load_indices))
     monkeypatch.setattr(writer, "write_csv", mock_write_csv)
     writer.writer()
